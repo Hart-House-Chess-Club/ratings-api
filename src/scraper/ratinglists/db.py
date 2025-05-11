@@ -38,13 +38,36 @@ except Exception as e:
     mongo_enabled = False
 
 
+def make_json_serializable(doc):
+    """Convert MongoDB document to be JSON serializable by converting ObjectId to string."""
+    if not doc:
+        return doc
+        
+    if isinstance(doc, list):
+        return [make_json_serializable(item) for item in doc]
+    
+    if isinstance(doc, dict):
+        for key, value in doc.items():
+            # ObjectId typically has an attribute called "_type" with value "ObjectId"
+            # and will always have the "_id" field
+            if key == "_id" and hasattr(value, "__str__"):
+                doc[key] = str(value)
+            elif isinstance(value, dict):
+                doc[key] = make_json_serializable(value)
+            elif isinstance(value, list):
+                doc[key] = make_json_serializable(value)
+    
+    return doc
+
+
 def get_fide_player(player_id: str) -> Optional[Dict[str, Any]]:
     """Get FIDE player rating data by ID"""
     if not mongo_enabled:
         return None
     
     try:
-        return fide_collection.find_one({"fideid": player_id})
+        player_data = fide_collection.find_one({"fideid": player_id})
+        return make_json_serializable(player_data)
     except Exception as e:
         print(f"Error retrieving FIDE player: {e}")
         return None
@@ -56,7 +79,8 @@ def get_cfc_player(cfc_id: str) -> Optional[Dict[str, Any]]:
         return None
     
     try:
-        return cfc_collection.find_one({"CFC Number": cfc_id})
+        player_data = cfc_collection.find_one({"CFC Number": cfc_id})
+        return make_json_serializable(player_data)
     except Exception as e:
         print(f"Error retrieving CFC player: {e}")
         return None
@@ -68,7 +92,8 @@ def get_top_rated_fide(limit: int = 100) -> List[Dict[str, Any]]:
         return []
     
     try:
-        return list(fide_collection.find().sort("rating", DESCENDING).limit(limit))
+        players = list(fide_collection.find().sort("rating", DESCENDING).limit(limit))
+        return make_json_serializable(players)
     except Exception as e:
         print(f"Error retrieving top FIDE players: {e}")
         return []
@@ -80,7 +105,8 @@ def get_top_rated_cfc(limit: int = 100) -> List[Dict[str, Any]]:
         return []
     
     try:
-        return list(cfc_collection.find().sort("Rating", DESCENDING).limit(limit))
+        players = list(cfc_collection.find().sort("Rating", DESCENDING).limit(limit))
+        return make_json_serializable(players)
     except Exception as e:
         print(f"Error retrieving top CFC players: {e}")
         return []
@@ -93,9 +119,11 @@ def search_player(query: str, collection: str = "fide") -> List[Dict[str, Any]]:
     
     try:
         if collection.lower() == "fide":
-            return list(fide_collection.find({"$text": {"$search": query}}).limit(20))
+            players = list(fide_collection.find({"$text": {"$search": query}}).limit(20))
         else:
-            return list(cfc_collection.find({"$text": {"$search": query}}).limit(20))
+            players = list(cfc_collection.find({"$text": {"$search": query}}).limit(20))
+            
+        return make_json_serializable(players)
     except Exception as e:
         print(f"Error searching for players: {e}")
         return []
@@ -108,7 +136,7 @@ def get_rating_list_metadata() -> Dict[str, Any]:
     
     try:
         metadata = metadata_collection.find_one({"_id": "rating_lists"})
-        return metadata if metadata else {}
+        return make_json_serializable(metadata) if metadata else {}
     except Exception as e:
         print(f"Error retrieving metadata: {e}")
         return {}
