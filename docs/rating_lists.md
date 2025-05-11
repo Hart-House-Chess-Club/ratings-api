@@ -68,7 +68,7 @@ See [architecture_diagram.txt](architecture_diagram.txt) for a visual representa
   - Number of games
 
 ### CFC Rating List
-- **Source URL**: https://www.chess.ca/wp-content/uploads/tdlist.txt
+- **Source URL**: https://storage.googleapis.com/cfc-public/data/tdlist.txt
 - **Format**: CSV file (tab-delimited)
 - **Update Frequency**: Weekly
 - **Data Structure**: Contains Canadian chess player information including:

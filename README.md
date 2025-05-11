@@ -149,7 +149,7 @@ This project is configured for easy deployment to any Linux server using Docker:
 ## Rating List Data Sources
 
 - FIDE Rating List: Downloaded from `https://ratings.fide.com/download/standard_rating_list_xml.zip`
-- CFC Rating List: Downloaded from `https://www.chess.ca/wp-content/uploads/tdlist.txt`
+- CFC Rating List: Downloaded from `https://storage.googleapis.com/cfc-public/data/tdlist.txt`
 
 ## Environment Variables
 
@@ -161,7 +161,7 @@ This project is configured for easy deployment to any Linux server using Docker:
 | `MONGO_URI` | MongoDB connection URI | `mongodb://localhost:27017/` |
 | `MONGO_DB` | MongoDB database name | `fide_api` |
 | `FIDE_DOWNLOAD_URL` | URL to download FIDE rating list | `https://ratings.fide.com/download/standard_rating_list_xml.zip` |
-| `CFC_DOWNLOAD_URL` | URL to download CFC rating list | `https://www.chess.ca/wp-content/uploads/tdlist.txt` |
+| `CFC_DOWNLOAD_URL` | URL to download CFC rating list | `https://storage.googleapis.com/cfc-public/data/tdlist.txt` |
 
 ## Credits
 
