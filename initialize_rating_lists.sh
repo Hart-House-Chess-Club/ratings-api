@@ -30,25 +30,11 @@ logger.info(f"Reset result: {'Successful' if reset_result else 'Failed'}")
 
 # Step 1: Try to download the latest rating lists
 logger.info("Downloading latest rating lists...")
-# fide_download = update_fide_rating_list()
-cfc_download = update_cfc_rating_list()
+fide_update = update_fide_rating_list()
+cfc_update = update_cfc_rating_list()
 
-# logger.info(f"FIDE download: {'Successful' if fide_download else 'Failed'}")
-logger.info(f"CFC download: {'Successful' if cfc_download else 'Failed'}")
-
-# Step 2: Parse the rating lists
-# logger.info("Parsing rating lists...")
-# fide_result = parse_fide_rating_list()
-# cfc_result = parse_cfc_rating_list()
-
-# logger.info(f"FIDE parsing: {'Successful' if fide_result else 'Failed'}")
-# logger.info(f"CFC parsing: {'Successful' if cfc_result else 'Failed'}")
-
-# If either failed, try full update procedure
-# if not fide_result or not cfc_result:
-#     logger.warning("Some parsing failed. Attempting full update procedure...")
-#     update_results = update_all_rating_lists()
-#     logger.info(f"Update results: {update_results}")
+logger.info(f"FIDE parsing: {'Successful' if fide_update else 'Failed'}")
+logger.info(f"CFC parsing: {'Successful' if cfc_update else 'Failed'}")
 
 logger.info("Rating list initialization completed!")
 EOL
