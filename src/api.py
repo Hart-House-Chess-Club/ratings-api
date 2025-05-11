@@ -42,6 +42,16 @@ async def player_info(fide_id: str, history: bool = False):
   return response
 
 # Rating list endpoints
+@app.get("/ratinglist/fide/top", tags=["Rating Lists"])
+async def get_top_fide_players(limit: int = 100):
+  """Get top rated FIDE players from the rating list database."""
+  return ratings_db.get_top_rated_fide(limit)
+
+@app.get("/ratinglist/cfc/top", tags=["Rating Lists"])
+async def get_top_cfc_players(limit: int = 100):
+  """Get top rated CFC players from the rating list database."""
+  return ratings_db.get_top_rated_cfc(limit)
+
 @app.get("/ratinglist/fide/{player_id}", tags=["Rating Lists"])
 async def get_fide_player_rating(player_id: str):
   """Get a FIDE player's rating data from the rating list database."""
@@ -57,16 +67,6 @@ async def get_cfc_player_rating(player_id: str):
   if not player:
     raise HTTPException(status_code=404, detail="Player not found")
   return player
-
-@app.get("/ratinglist/fide/top", tags=["Rating Lists"])
-async def get_top_fide_players(limit: int = 100):
-  """Get top rated FIDE players from the rating list database."""
-  return ratings_db.get_top_rated_fide(limit)
-
-@app.get("/ratinglist/cfc/top", tags=["Rating Lists"])
-async def get_top_cfc_players(limit: int = 100):
-  """Get top rated CFC players from the rating list database."""
-  return ratings_db.get_top_rated_cfc(limit)
 
 @app.get("/ratinglist/search", tags=["Rating Lists"])
 async def search_players(query: str, list_type: str = "fide"):
