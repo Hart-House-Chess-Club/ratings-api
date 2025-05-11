@@ -17,7 +17,7 @@ services:
       - MONGO_DB=fide_api
       - MONGO_FIDE_COLLECTION=fide_ratings
       - MONGO_CFC_COLLECTION=cfc_ratings
-      - FIDE_DOWNLOAD_URL=https://ratings.fide.com/download/standard_rating_list.xml
+      - FIDE_DOWNLOAD_URL=https://ratings.fide.com/download/standard_rating_list_xml.zip
       - CFC_DOWNLOAD_URL=https://www.chess.ca/wp-content/uploads/tdlist.txt
     depends_on:
       - redis

@@ -2,8 +2,8 @@ FROM python:3.12-alpine3.20
 
 WORKDIR /app
 
-# Install dependencies needed for building Python packages
-RUN apk add --no-cache build-base libffi-dev
+# Install dependencies needed for building Python packages and handling ZIP files
+RUN apk add --no-cache build-base libffi-dev zip unzip
 
 # Copy requirements first for better layer caching
 COPY requirements.txt .
