@@ -1,34 +1,56 @@
 #!/bin/sh
-# filepath: /Users/victorzheng/Documents/fide-api/fide-api/initialize_rating_lists.sh
+# This script initializes both FIDE and CFC rating lists
 
-# This script initializes the rating lists by running the parser directly
-
-echo "Initializing rating lists..."
+echo "Starting rating lists initialization..."
 
 # Make sure we're in the project directory
 cd "$(dirname "$0")"
 
 # Create a Python script to run the initialization
 cat > ./init_ratings.py << 'EOL'
+import os
+import logging
 from src.scraper.ratinglists.parsers import parse_fide_rating_list, parse_cfc_rating_list
-from src.scraper.ratinglists.updater import update_all_rating_lists
+from src.scraper.ratinglists.updater import update_cfc_rating_list, update_fide_rating_list
+from src.scraper.ratinglists.db import reset_collections
 
-print("Starting initial rating list parsing...")
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger('rating_list_init')
 
-# Parse existing files if available
-fide_result = parse_fide_rating_list()
-print(f"FIDE parsing result: {'Successful' if fide_result else 'Failed'}")
+logger.info("Starting rating list initialization...")
 
-cfc_result = parse_cfc_rating_list()
-print(f"CFC parsing result: {'Successful' if cfc_result else 'Failed'}")
+# First reset collections to ensure clean state
+logger.info("Resetting database collections...")
+reset_result = reset_collections()
+logger.info(f"Reset result: {'Successful' if reset_result else 'Failed'}")
 
-# If parsing failed, try downloading and updating
-if not fide_result or not cfc_result:
-    print("Some parsing failed. Attempting to download and update...")
-    update_results = update_all_rating_lists()
-    print(f"Update results: {update_results}")
+# Step 1: Try to download the latest rating lists
+logger.info("Downloading latest rating lists...")
+# fide_download = update_fide_rating_list()
+cfc_download = update_cfc_rating_list()
 
-print("Rating list initialization completed!")
+# logger.info(f"FIDE download: {'Successful' if fide_download else 'Failed'}")
+logger.info(f"CFC download: {'Successful' if cfc_download else 'Failed'}")
+
+# Step 2: Parse the rating lists
+# logger.info("Parsing rating lists...")
+# fide_result = parse_fide_rating_list()
+# cfc_result = parse_cfc_rating_list()
+
+# logger.info(f"FIDE parsing: {'Successful' if fide_result else 'Failed'}")
+# logger.info(f"CFC parsing: {'Successful' if cfc_result else 'Failed'}")
+
+# If either failed, try full update procedure
+# if not fide_result or not cfc_result:
+#     logger.warning("Some parsing failed. Attempting full update procedure...")
+#     update_results = update_all_rating_lists()
+#     logger.info(f"Update results: {update_results}")
+
+logger.info("Rating list initialization completed!")
 EOL
 
 # Run the initialization script

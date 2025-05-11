@@ -1,4 +1,7 @@
 import requests
+import datetime
+import os
+import pymongo
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.responses import ORJSONResponse, RedirectResponse
@@ -104,3 +107,64 @@ async def reset_rating_lists_db(background_tasks: BackgroundTasks):
     background_tasks.add_task(update_all_rating_lists)
     
     return {"status": "reset_completed", "message": "Rating lists database has been reset and reinitialization started"}
+
+@app.get("/health", tags=["System"])
+async def health_check():
+    """Health check endpoint for monitoring the API status"""
+    health_status = {
+        "status": "ok",
+        "timestamp": datetime.datetime.now().isoformat(),
+        "version": "1.0.0",
+        "services": {}
+    }
+    
+    # Check Redis connection
+    try:
+        from src.scraper.cache import redis_client
+        redis_info = redis_client.info()
+        health_status["services"]["redis"] = {
+            "status": "ok",
+            "version": redis_info.get("redis_version", "unknown")
+        }
+    except Exception as e:
+        health_status["services"]["redis"] = {
+            "status": "error",
+            "error": str(e)
+        }
+        health_status["status"] = "degraded"
+    
+    # Check MongoDB connection
+    try:
+        mongo_uri = os.environ.get("MONGO_URI", "mongodb://localhost:27017/")
+        mongo_client = pymongo.MongoClient(mongo_uri, serverSelectionTimeoutMS=2000)
+        server_info = mongo_client.server_info()
+        fide_count = ratings_db.fide_collection.count_documents({})
+        cfc_count = ratings_db.cfc_collection.count_documents({})
+        
+        health_status["services"]["mongodb"] = {
+            "status": "ok",
+            "version": server_info.get("version", "unknown"),
+            "fide_players": fide_count,
+            "cfc_players": cfc_count
+        }
+    except Exception as e:
+        health_status["services"]["mongodb"] = {
+            "status": "error",
+            "error": str(e)
+        }
+        health_status["status"] = "degraded"
+    
+    # Check FIDE website accessibility
+    try:
+        fide_response = requests.get("https://ratings.fide.com", timeout=5)
+        health_status["services"]["fide_website"] = {
+            "status": "ok" if fide_response.status_code == 200 else "error",
+            "status_code": fide_response.status_code
+        }
+    except Exception as e:
+        health_status["services"]["fide_website"] = {
+            "status": "error",
+            "error": str(e)
+        }
+    
+    return health_status

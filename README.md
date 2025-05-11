@@ -36,6 +36,11 @@ Check it on:
 - Search for players by name
 - Auto-updating rating lists
 
+For detailed documentation, see:
+- [Rating Lists Documentation](docs/rating_lists.md)
+- [System Architecture](docs/system_architecture.md)
+- [Monitoring Guide](docs/monitoring_guide.md)
+
 ## Usage
 
 ### Docker (recommended)
@@ -111,6 +116,12 @@ This project is configured for easy deployment to any Linux server using Docker:
    - Reset the MongoDB database: `docker exec fide-api python reset_mongodb.py`
    - Check logs: `docker logs fide-api`
    - View MongoDB data: `docker exec -it mongodb mongosh fide_api`
+   - Check system health: `curl http://localhost:8000/health`
+
+5. **Monitoring**:
+   - The API includes a `/health` endpoint for system monitoring
+   - Docker health checks are configured for all containers
+   - See [docs/monitoring_guide.md](docs/monitoring_guide.md) for comprehensive monitoring instructions
 
 ### Update Schedule
 
@@ -133,6 +144,7 @@ This project is configured for easy deployment to any Linux server using Docker:
 - `GET /ratinglist/metadata` - Get rating list metadata
 - `POST /ratinglist/update` - Trigger manual update of rating lists
 - `POST /ratinglist/reset` - Reset rating lists database
+- `GET /health` - Check API and service health status
 
 ## Rating List Data Sources
 
@@ -177,7 +189,3 @@ xmltodict==0.13.0
 MIT
 
 ---
-
-> [Website](https://cassiofernando.com) &nbsp;&middot;&nbsp;
-> GitHub [@cassiofb-dev](https://github.com/cassiofb-dev) &nbsp;&middot;&nbsp;
-> Twitter [@cassiofb_dev](https://twitter.com/cassiofb_dev)
