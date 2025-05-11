@@ -1,0 +1,106 @@
+name: Docker Build and Deploy
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev]
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Set up Docker Buildx for better caching and multi-platform support
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Log in to GitHub Container Registry
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Extract metadata for the Docker image
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/${{ github.repository }}/fide-api
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,format=short
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      # Build and push the Docker image
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Pull the latest image
+            docker pull ghcr.io/${{ github.repository }}/fide-api:latest
+            
+            # Create or update docker-compose.yml
+            cat > ~/fide-api-docker-compose.yml << 'EOL'
+            services:
+              fide-api:
+                container_name: fide-api
+                image: ghcr.io/${{ github.repository }}/fide-api:latest
+                restart: always
+                ports:
+                  - "8000:8000"
+                environment:
+                  - REDIS_HOST=redis
+                  - REDIS_PORT=6379
+                  - REDIS_DB=0
+                  - CACHE_EXPIRY=3600
+                depends_on:
+                  - redis
+                
+              redis:
+                image: redis:7-alpine
+                container_name: fide-redis
+                restart: always
+                volumes:
+                  - redis-data:/data
+                command: redis-server --save 60 1 --loglevel warning
+
+            volumes:
+              redis-data:
+            EOL
+            
+            # Run with docker-compose
+            docker-compose -f ~/fide-api-docker-compose.yml down
+            docker-compose -f ~/fide-api-docker-compose.yml up -d
