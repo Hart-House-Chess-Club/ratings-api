@@ -2,7 +2,7 @@
   FIDE API
 </h1>
 
-<h4 align="center">Python FIDE scraper and HTTP API</h4>
+<h4 align="center">Python FIDE scraper, FIDE Ratings API, CFC Ratings API, and available in a web-based HTTP API</h4>
 
 <p align="center">
   <a href="#about">About</a> •
@@ -18,7 +18,9 @@
 
 Working with FIDE official data is not simple, mainly because they don't have an API. That's the reason I made a simple API with FastAPI to scrape the data from their own website and provide it as JSON over HTTP requests.
 
-A Redis cache is implemented to provide faster lookups for common use cases. Additionally, the API now includes MongoDB integration for storing and querying FIDE and CFC rating lists, with automatic periodic updates.
+A Redis cache is implemented to provide faster lookups for common use cases. Additionally, the API now includes MongoDB integration for storing and querying FIDE and CFC rating lists, with automatic periodic updates. 
+
+A mongodb server is used for storing latest CFC and FIDE ratings. 
 
 ## Features
 
