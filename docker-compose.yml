@@ -13,8 +13,15 @@ services:
       - REDIS_PORT=6379
       - REDIS_DB=0
       - CACHE_EXPIRY=3600
+      - MONGO_URI=mongodb://localhost:27017/
+      - MONGO_DB=fide_api
+      - MONGO_FIDE_COLLECTION=fide_ratings
+      - MONGO_CFC_COLLECTION=cfc_ratings
+      - FIDE_DOWNLOAD_URL=https://ratings.fide.com/download/standard_rating_list.xml
+      - CFC_DOWNLOAD_URL=https://www.chess.ca/wp-content/uploads/tdlist.txt
     depends_on:
       - redis
+      - mongodb
       
   redis:
     image: redis:7-alpine
@@ -24,6 +31,16 @@ services:
     volumes:
       - redis-data:/data
     command: redis-server --save 60 1 --loglevel warning
+    
+  mongodb:
+    image: mongo:6
+    container_name: fide-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-data:/data/db
+    command: mongod --quiet --logpath /dev/null
 
 volumes:
   redis-data:
+  mongodb-data:

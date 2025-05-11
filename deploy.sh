@@ -18,8 +18,13 @@ services:
       - REDIS_PORT=6379
       - REDIS_DB=0
       - CACHE_EXPIRY=3600
+      - MONGO_URI=mongodb://mongodb:27017/
+      - MONGO_DB=fide_api
+      - FIDE_DOWNLOAD_URL=https://ratings.fide.com/download/standard_rating_list.xml
+      - CFC_DOWNLOAD_URL=https://www.chess.ca/wp-content/uploads/tdlist.txt
     depends_on:
       - redis
+      - mongodb
     
   redis:
     image: redis:7-alpine
@@ -28,13 +33,26 @@ services:
     volumes:
       - redis-data:/data
     command: redis-server --save 60 1 --loglevel warning
+    
+  mongodb:
+    image: mongo:6
+    container_name: fide-mongodb
+    restart: always
+    volumes:
+      - mongodb-data:/data/db
+    command: mongod --quiet --logpath /dev/null
 
 volumes:
   redis-data:
+  mongodb-data:
 EOL
 
 # Run with docker-compose
 docker-compose -f ~/fide-api-docker-compose.yml down
 docker-compose -f ~/fide-api-docker-compose.yml up -d
+
+# Initialize rating lists if needed
+echo "Initializing rating lists (this may take a while if files need to be downloaded)..."
+docker exec fide-api bash -c "chmod +x /app/initialize_rating_lists.sh && /app/initialize_rating_lists.sh"
 
 echo "FIDE API deployed successfully!"
