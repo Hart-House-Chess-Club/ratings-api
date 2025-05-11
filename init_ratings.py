@@ -1,15 +1,3 @@
-#!/bin/sh
-# filepath: /Users/victorzheng/Documents/fide-api/fide-api/initialize_rating_lists.sh
-
-# This script initializes the rating lists by running the parser directly
-
-echo "Initializing rating lists..."
-
-# Make sure we're in the project directory
-cd "$(dirname "$0")"
-
-# Create a Python script to run the initialization
-cat > ./init_ratings.py << 'EOL'
 from src.scraper.ratinglists.parsers import parse_fide_rating_list, parse_cfc_rating_list
 from src.scraper.ratinglists.updater import update_all_rating_lists
 
@@ -29,12 +17,3 @@ if not fide_result or not cfc_result:
     print(f"Update results: {update_results}")
 
 print("Rating list initialization completed!")
-EOL
-
-# Run the initialization script
-python init_ratings.py
-
-# Clean up
-rm ./init_ratings.py
-
-echo "Rating list initialization complete!"

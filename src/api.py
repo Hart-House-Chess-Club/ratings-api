@@ -18,6 +18,7 @@ app.add_middleware(
   allow_headers=["*"],
 )
 
+# default endpoints -> redirect to docs
 @app.get("/")
 def home():
   return RedirectResponse('/docs')

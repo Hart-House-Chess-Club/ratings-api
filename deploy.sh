@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/sh
+# filepath: /Users/victorzheng/Documents/fide-api/fide-api/deploy.sh
 # Simple script to pull and deploy the FIDE API Docker image
 
 # Pull the latest image
@@ -51,8 +52,12 @@ EOL
 docker-compose -f ~/fide-api-docker-compose.yml down
 docker-compose -f ~/fide-api-docker-compose.yml up -d
 
-# Initialize rating lists if needed
+# Initialize rating lists if needed (using sh for Alpine compatibility)
 echo "Initializing rating lists (this may take a while if files need to be downloaded)..."
-docker exec fide-api bash -c "chmod +x /app/initialize_rating_lists.sh && /app/initialize_rating_lists.sh"
+docker exec fide-api sh -c "chmod +x /app/initialize_rating_lists.sh && sh /app/initialize_rating_lists.sh"
+
+# Start the updater service
+echo "Starting the rating list updater service..."
+docker exec -d fide-api sh -c "chmod +x /app/start_updater_service.sh && sh /app/start_updater_service.sh"
 
 echo "FIDE API deployed successfully!"

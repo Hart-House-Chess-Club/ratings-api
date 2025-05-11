@@ -161,4 +161,5 @@ cython_debug/
 .vercel
 
 standard_rating_list.xml
+standard_rating_list_xml.zip
 tdlist.txt

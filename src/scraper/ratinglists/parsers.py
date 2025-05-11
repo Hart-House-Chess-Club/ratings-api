@@ -16,7 +16,43 @@ from src.scraper.ratinglists.db import (
 )
 
 
-def parse_fide_rating_list(file_path: str = "rating-lists/standard_rating_list.xml") -> bool:
+def extract_zip(zip_path: str, extract_dir: str) -> str:
+    """Extract an XML file from a ZIP archive.
+    
+    Args:
+        zip_path: Path to the ZIP file
+        extract_dir: Directory to extract to
+        
+    Returns:
+        str: Path to the extracted XML file, or None if extraction failed
+    """
+    try:
+        import zipfile
+        
+        # Make sure the extract directory exists
+        os.makedirs(extract_dir, exist_ok=True)
+        
+        # Extract the file
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            # List all files in the ZIP
+            file_list = zip_ref.namelist()
+            print(f"ZIP contains: {file_list}")
+            
+            # Extract all files
+            zip_ref.extractall(extract_dir)
+            
+            # Find XML files in the extracted content
+            xml_files = [f for f in file_list if f.endswith('.xml')]
+            if xml_files:
+                return os.path.join(extract_dir, xml_files[0])
+            else:
+                print("No XML files found in ZIP archive")
+                return None
+    except Exception as e:
+        print(f"Error extracting ZIP file {zip_path}: {e}")
+        return None
+
+def parse_fide_rating_list(file_path: str = "rating-lists/standard_rating_list_xml.zip") -> bool:
     """Parse the FIDE rating list XML file and store in MongoDB.
     
     Returns True if successful, False otherwise.
@@ -26,9 +62,25 @@ def parse_fide_rating_list(file_path: str = "rating-lists/standard_rating_list.x
         return False
     
     try:
-        # Check if file exists
+        # Check if ZIP file exists
         if not os.path.exists(file_path):
             print(f"FIDE rating list file not found at {file_path}")
+            return False
+        
+        # If file is a ZIP file, extract it first
+        if file_path.endswith('.zip'):
+            print(f"Extracting ZIP file: {file_path}")
+            extract_dir = os.path.dirname(file_path)
+            xml_path = extract_zip(file_path, extract_dir)
+            if not xml_path:
+                print("Failed to extract XML file from ZIP")
+                return False
+            file_path = xml_path
+            print(f"Extracted XML file: {file_path}")
+        
+        # Check if the XML file exists now
+        if not os.path.exists(file_path):
+            print(f"FIDE rating list XML file not found at {file_path} after extraction")
             return False
         
         print(f"Starting to parse FIDE rating list from {file_path}...")
@@ -57,10 +109,12 @@ def parse_fide_rating_list(file_path: str = "rating-lists/standard_rating_list.x
                     "title": player.get("title", ""),
                     "w_title": player.get("w_title", ""),
                     "o_title": player.get("o_title", ""),
+                    "foa_title": player.get("foa_title", ""),
                     "rating": int(player.get("rating", "0") or "0"),
                     "games": int(player.get("games", "0") or "0"),
                     "birth_year": int(player.get("birthday", "0") or "0"),
-                    "flag": player.get("flag", ""),
+                    "flag": player.get(("flag", "") or "i"),
+                    "k_factor": player.get("k", ""),
                 }
                 
                 player_batch.append(processed_player)

@@ -18,7 +18,7 @@
 
 Working with FIDE official data is not simple, mainly because they don't have an API. That's the reason I made a simple API with FastAPI to scrape the data from their own website and provide it as JSON over HTTP requests.
 
-A Redis cache is implemented to provide faster lookups for common use cases. Additionally, the API now includes a MongoDB database for storing and querying FIDE and CFC rating lists.
+A Redis cache is implemented to provide faster lookups for common use cases.
 
 ## Features
 
@@ -28,10 +28,6 @@ Check it on:
 - Get top players list
 - Get player info
 - Get player history
-- Query FIDE rating list data
-- Query CFC rating list data
-- Search for players by name
-- Auto-updating rating lists
 
 ## Usage
 
@@ -97,3 +93,9 @@ uvicorn==0.31.0
 ## License
 
 MIT
+
+---
+
+> [Website](https://cassiofernando.com) &nbsp;&middot;&nbsp;
+> GitHub [@cassiofb-dev](https://github.com/cassiofb-dev) &nbsp;&middot;&nbsp;
+> Twitter [@cassiofb_dev](https://twitter.com/cassiofb_dev)

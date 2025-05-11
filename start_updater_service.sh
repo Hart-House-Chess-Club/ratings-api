@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # filepath: /Users/victorzheng/Documents/fide-api/fide-api/start_updater_service.sh
 
 # This script starts the rating list updater service in the background
