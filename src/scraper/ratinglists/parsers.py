@@ -185,12 +185,83 @@ def parse_cfc_rating_list(file_path: str = "rating-lists/tdlist.txt") -> bool:
         
         print(f"Starting to parse CFC rating list from {file_path}...")
         
-        # Use pandas to efficiently parse the CSV
-        # The CFC list is a more manageable size than the FIDE XML
-        df = pd.read_csv(file_path)
+        # Read the file content directly with encoding that works
+        with open(file_path, 'r', encoding='latin1') as file:
+            content = file.read()
         
-        # Clean column names
-        df.columns = [col.strip('"') for col in df.columns]
+        # Process the file line by line to handle the malformed CSV properly
+        lines = content.splitlines()
+        if not lines:
+            print("File is empty")
+            return False
+            
+        # Process the header line first
+        header_line = lines[0]
+        headers = [h.strip('"') for h in header_line.split(',')]
+        expected_field_count = len(headers)
+        print(f"Found {expected_field_count} columns in header: {headers}")
+        
+        # Process data rows with custom logic to handle stray quotation marks
+        data_rows = []
+        
+        for i, line in enumerate(lines[1:], 1):
+            if not line.strip():
+                continue
+            
+            # Special handling for the faulty CSV format
+            # Split by comma initially
+            raw_fields = line.split(',')
+            
+            # Process fields to handle the quotation mark issues
+            processed_fields = []
+            j = 0
+            
+            while j < len(raw_fields):
+                field = raw_fields[j]
+                
+                # Check if this is potentially the Province field (pos 4) before City (pos 5)
+                if j == 4 and j+1 < len(raw_fields):
+                    # Province field may be followed by city with trailing quote
+                    province = field.strip('"')
+                    city_with_quote = raw_fields[j+1]
+                    
+                    # Check if city ends with a quote but doesn't start with one
+                    if city_with_quote.endswith('"') and not city_with_quote.startswith('"'):
+                        # Fix the city field by removing the trailing quote
+                        city = city_with_quote.rstrip('"')
+                        processed_fields.append(province)
+                        processed_fields.append(city)
+                        j += 2
+                        continue
+                
+                # Handle any field that ends with a quote but doesn't start with one
+                if field.endswith('"') and not field.startswith('"'):
+                    field = field.rstrip('"')
+                
+                # Remove surrounding quotes if present
+                field = field.strip('"')
+                processed_fields.append(field)
+                j += 1
+            
+            # Handle field count mismatches
+            if len(processed_fields) != expected_field_count:
+                print(f"Warning: Line {i+1} has {len(processed_fields)} fields instead of {expected_field_count}")
+                
+                # If too few fields, pad with empty strings
+                if len(processed_fields) < expected_field_count:
+                    processed_fields.extend([''] * (expected_field_count - len(processed_fields)))
+                # If too many fields, truncate
+                elif len(processed_fields) > expected_field_count:
+                    processed_fields = processed_fields[:expected_field_count]
+            
+            data_rows.append(processed_fields)
+        
+        # Convert to DataFrame
+        df = pd.DataFrame(data_rows, columns=headers)
+        
+        # Clean up the data - specifically fix the City column which has trailing quotes
+        if 'City' in df.columns:
+            df['City'] = df['City'].apply(lambda x: x.rstrip('"') if isinstance(x, str) else x)
         
         # Process in batches
         batch_size = 1000
