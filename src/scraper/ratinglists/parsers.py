@@ -225,6 +225,16 @@ def parse_cfc_rating_list(file_path: str = "rating-lists/tdlist.txt") -> bool:
                     province = field.strip('"')
                     city_with_quote = raw_fields[j+1]
                     
+                    # consider situations where we may have a city entry such as Paris, France"
+                    city_country = raw_fields[j+2] if j+2 < len(raw_fields) else ''
+                    if city_country.endswith('"') and not city_country.startswith('"'):
+                        # Fix the city field by removing the trailing quote
+                        city = city_with_quote.strip() + " - " + city_country.rstrip('"').strip()
+                        processed_fields.append(province)
+                        processed_fields.append(city)
+                        j += 3
+                        continue
+                    
                     # Check if city ends with a quote but doesn't start with one
                     if city_with_quote.endswith('"') and not city_with_quote.startswith('"'):
                         # Fix the city field by removing the trailing quote
@@ -233,6 +243,7 @@ def parse_cfc_rating_list(file_path: str = "rating-lists/tdlist.txt") -> bool:
                         processed_fields.append(city)
                         j += 2
                         continue
+                
                 
                 # Handle any field that ends with a quote but doesn't start with one
                 if field.endswith('"') and not field.startswith('"'):
