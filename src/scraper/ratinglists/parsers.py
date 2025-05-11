@@ -207,7 +207,7 @@ def parse_cfc_rating_list(file_path: str = "rating-lists/tdlist.txt") -> bool:
                 
                 # Use CFC# as the unique identifier
                 cfc_collection.update_one(
-                    {"CFC#": clean_record["CFC#"]},
+                    {"CFC Number": clean_record["CFC#"]},
                     {"$set": clean_record},
                     upsert=True
                 )

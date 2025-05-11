@@ -21,12 +21,12 @@ try:
     metadata_collection = db[MONGO_METADATA_COLLECTION]
     
     # Create indexes for better query performance
-    fide_collection.create_index([("id", ASCENDING)], unique=True)
-    fide_collection.create_index([("fideid", ASCENDING)])
+    # Use fideid as the unique identifier
+    fide_collection.create_index([("fideid", ASCENDING)], unique=True)
     fide_collection.create_index([("rating", DESCENDING)])
     fide_collection.create_index([("name", "text")])
     
-    cfc_collection.create_index([("CFC#", ASCENDING)], unique=True)
+    cfc_collection.create_index([("CFC Number", ASCENDING)], unique=True)
     cfc_collection.create_index([("FIDE Number", ASCENDING)])
     cfc_collection.create_index([("Rating", DESCENDING)])
     cfc_collection.create_index([("Last", "text"), ("First", "text")])
@@ -56,7 +56,7 @@ def get_cfc_player(cfc_id: str) -> Optional[Dict[str, Any]]:
         return None
     
     try:
-        return cfc_collection.find_one({"CFC#": cfc_id})
+        return cfc_collection.find_one({"CFC Number": cfc_id})
     except Exception as e:
         print(f"Error retrieving CFC player: {e}")
         return None
@@ -112,3 +112,34 @@ def get_rating_list_metadata() -> Dict[str, Any]:
     except Exception as e:
         print(f"Error retrieving metadata: {e}")
         return {}
+
+
+def reset_collections():
+    """Reset (drop and recreate) all collections.
+    Use this when there are issues with indexes or corrupted data.
+    """
+    if not mongo_enabled:
+        print("MongoDB not enabled, cannot reset collections")
+        return False
+    
+    try:
+        # Drop collections
+        fide_collection.drop()
+        cfc_collection.drop()
+        metadata_collection.drop()
+        
+        # Recreate indexes
+        # fide_collection.create_index([("fideid", ASCENDING)], unique=True)
+        # fide_collection.create_index([("rating", DESCENDING)])
+        # fide_collection.create_index([("name", "text")])
+        
+        # cfc_collection.create_index([("CFC Number", ASCENDING)], unique=True)
+        # cfc_collection.create_index([("FIDE Number", ASCENDING)])
+        # cfc_collection.create_index([("Rating", DESCENDING)])
+        # cfc_collection.create_index([("Last", "text"), ("First", "text")])
+        
+        print("Collections reset successfully")
+        return True
+    except Exception as e:
+        print(f"Error resetting collections: {e}")
+        return False

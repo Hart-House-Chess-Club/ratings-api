@@ -22,7 +22,7 @@ services:
       - MONGO_URI=mongodb://mongodb:27017/
       - MONGO_DB=fide_api
       - FIDE_DOWNLOAD_URL=https://ratings.fide.com/download/standard_rating_list_xml.zip
-      - CFC_DOWNLOAD_URL=https://www.chess.ca/wp-content/uploads/tdlist.txt
+      - CFC_DOWNLOAD_URL=https://storage.googleapis.com/cfc-public/data/tdlist.txt
     depends_on:
       - redis
       - mongodb

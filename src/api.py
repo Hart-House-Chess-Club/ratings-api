@@ -88,3 +88,19 @@ async def trigger_rating_lists_update(background_tasks: BackgroundTasks):
   background_tasks.add_task(update_all_rating_lists)
   
   return {"status": "update_started", "message": "Rating list update has been started in the background"}
+
+@app.post("/ratinglist/reset", tags=["Rating Lists"])
+async def reset_rating_lists_db(background_tasks: BackgroundTasks):
+    """Reset the rating lists database collections (admin only)"""
+    # In a production environment, you would add authentication here
+    
+    from src.scraper.ratinglists.db import reset_collections
+    
+    success = reset_collections()
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to reset rating lists database")
+    
+    # Start a background task to reinitialize the database
+    background_tasks.add_task(update_all_rating_lists)
+    
+    return {"status": "reset_completed", "message": "Rating lists database has been reset and reinitialization started"}
