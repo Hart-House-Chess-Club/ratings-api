@@ -11,7 +11,12 @@ from src.scraper import fide_scraper
 from src.scraper.ratinglists import db as ratings_db
 from src.scraper.ratinglists.updater import update_all_rating_lists
 
-app = FastAPI(default_response_class=ORJSONResponse)
+app = FastAPI(
+    title="FIDE API",
+    version="2.0.0",
+    description="Highly reliable chess ratings API for FIDE, CFC, and other rating systems.",
+    default_response_class=ORJSONResponse
+)
 
 app.add_middleware(
   CORSMiddleware,
