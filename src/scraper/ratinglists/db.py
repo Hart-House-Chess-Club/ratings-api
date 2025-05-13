@@ -105,7 +105,13 @@ def get_top_rated_cfc(limit: int = 100) -> List[Dict[str, Any]]:
         return []
     
     try:
-        players = list(cfc_collection.find().sort("Rating", DESCENDING).limit(limit))
+        # Convert Rating to integer for proper numerical sorting
+        pipeline = [
+            {"$addFields": {"RatingNum": {"$toInt": "$Rating"}}},
+            {"$sort": {"RatingNum": -1}},
+            {"$limit": limit}
+        ]
+        players = list(cfc_collection.aggregate(pipeline))
         return make_json_serializable(players)
     except Exception as e:
         print(f"Error retrieving top CFC players: {e}")
