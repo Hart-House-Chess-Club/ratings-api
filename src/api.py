@@ -12,9 +12,9 @@ from src.scraper.ratinglists import db as ratings_db
 from src.scraper.ratinglists.updater import update_all_rating_lists, update_cfc_rating_list, update_fide_rating_list
 
 app = FastAPI(
-    title="FIDE API",
+    title="Chess Ratings API",
     version="2.0.0",
-    description="Highly reliable chess ratings API for FIDE, CFC, and other rating systems.",
+    description="Highly reliable, free, chess ratings API for FIDE, CFC, and other rating systems.",
     default_response_class=ORJSONResponse
 )
 
