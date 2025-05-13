@@ -112,6 +112,13 @@ This project is configured for easy deployment to any Linux server using Docker:
      - Redis for caching
      - MongoDB for rating list storage
 
+   - Alternative (with MongoDB Atlas): 
+   - The `mongo-docker-compose.yml` includes
+      - FIDE API service
+      - Redis for caching
+   
+   For deployments involving MongoDB, ensure that the MONGO_URI is set correctly. 
+
 4. **Maintenance Commands**:
    - Reset the MongoDB database: `docker exec fide-api python reset_mongodb.py`
    - Check logs: `docker logs fide-api`
