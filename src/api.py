@@ -88,33 +88,33 @@ async def get_rating_lists_metadata():
   """Get metadata about the rating lists (last update, etc.)"""
   return ratings_db.get_rating_list_metadata()
 
-@app.post("/update", tags=["System"])
-async def trigger_rating_lists_update(background_tasks: BackgroundTasks):
-  """Trigger an update of the rating lists (admin only)"""
-  # In a production environment, you would add authentication here
+# @app.post("/update", tags=["System"])
+# async def trigger_rating_lists_update(background_tasks: BackgroundTasks):
+#   """Trigger an update of the rating lists (admin only)"""
+#   # In a production environment, you would add authentication here
   
-  # Run update in the background to avoid blocking the request
-  background_tasks.add_task(update_all_rating_lists)
+#   # Run update in the background to avoid blocking the request
+#   background_tasks.add_task(update_all_rating_lists)
   
-  return {"status": "update_started", "message": "Rating list update has been started in the background"}
+#   return {"status": "update_started", "message": "Rating list update has been started in the background"}
 
-@app.post("/ratinglist/reset", tags=["System"])
-async def reset_rating_lists_db(background_tasks: BackgroundTasks):
-    """Reset the rating lists database collections (admin only)"""
-    # In a production environment, you would add authentication here
+# @app.post("/ratinglist/reset", tags=["System"])
+# async def reset_rating_lists_db(background_tasks: BackgroundTasks):
+#     """Reset the rating lists database collections (admin only)"""
+#     # In a production environment, you would add authentication here
     
-    from src.scraper.ratinglists.db import reset_collections
+#     from src.scraper.ratinglists.db import reset_collections
     
-    success = reset_collections()
-    if not success:
-        raise HTTPException(status_code=500, detail="Failed to reset rating lists database")
+#     success = reset_collections()
+#     if not success:
+#         raise HTTPException(status_code=500, detail="Failed to reset rating lists database")
     
-    # Start a background task to reinitialize the database
-    background_tasks.add_task(update_all_rating_lists)
+#     # Start a background task to reinitialize the database
+#     background_tasks.add_task(update_all_rating_lists)
     
-    return {"status": "reset_completed", "message": "Rating lists database has been reset and reinitialization started"}
+#     return {"status": "reset_completed", "message": "Rating lists database has been reset and reinitialization started"}
 
-@app.get("/health", tags=["System"])
+@app.get("/health", tags=["All"])
 async def health_check():
     """Health check endpoint for monitoring the API status"""
     health_status = {
