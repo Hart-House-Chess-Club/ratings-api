@@ -145,51 +145,73 @@ The updater service runs in the background and:
 
 ## API Endpoints
 
-### Get FIDE Player
-- **Endpoint**: `/ratinglist/fide/{player_id}`
-- **Method**: GET
-- **Response**: Single player object from FIDE list
+### FIDE Player Endpoints
 
-### Get CFC Player
-- **Endpoint**: `/ratinglist/cfc/{player_id}`
+#### Get Top Active FIDE Players
+- **Endpoint**: `/fide/top_active/`
 - **Method**: GET
-- **Response**: Single player object from CFC list
-
-### Get Top Players
-- **Endpoint**: `/ratinglist/fide/top` or `/ratinglist/cfc/top`
-- **Method**: GET
-- **Query Parameters**: 
+- **Query Parameters**:
   - `limit`: Number of players to return (default: 100)
-  - `category`: For FIDE, one of "standard", "rapid", "blitz" (default: "standard")
-- **Response**: List of top rated players
+  - `history`: Whether to include rating history (default: false)
+- **Response**: List of top active FIDE players
 
-### Search Players
+#### Get Top FIDE Players By Rating
+- **Endpoint**: `/fide/top_by_rating`
+- **Method**: GET
+- **Query Parameters**:
+  - `limit`: Number of players to return (default: 100)
+- **Response**: List of top rated FIDE players from the database
+
+#### Get FIDE Player Rating
+- **Endpoint**: `/fide/{player_id}`
+- **Method**: GET
+- **Response**: Single player object from FIDE rating database
+
+#### Get FIDE Player History
+- **Endpoint**: `/fide/player_history/`
+- **Method**: GET
+- **Query Parameters**:
+  - `fide_id`: FIDE ID of the player
+- **Response**: Rating history data for the specified player
+
+#### Get FIDE Player Info
+- **Endpoint**: `/fide/player_info/`
+- **Method**: GET
+- **Query Parameters**:
+  - `fide_id`: FIDE ID of the player
+  - `history`: Whether to include rating history (default: false)
+- **Response**: Detailed player information
+
+### CFC Player Endpoints
+
+#### Get Top CFC Players By Rating
+- **Endpoint**: `/cfc/top_by_rating`
+- **Method**: GET
+- **Query Parameters**:
+  - `limit`: Number of players to return (default: 100)
+- **Response**: List of top rated CFC players from the database
+
+#### Get CFC Player Rating
+- **Endpoint**: `/cfc/{player_id}`
+- **Method**: GET
+- **Response**: Single player object from CFC rating database
+
+### General Endpoints
+
+#### Search Players
 - **Endpoint**: `/ratinglist/search`
 - **Method**: GET
 - **Query Parameters**:
-  - `name`: Player name to search (required)
-  - `source`: "fide", "cfc", or "all" (default: "all")
-  - `limit`: Maximum number of results (default: 20)
+  - `query`: Player name to search (required)
+  - `list_type`: "fide" or "cfc" (default: "fide")
 - **Response**: List of matching players
 
-### Get Metadata
+#### Get Rating Lists Metadata
 - **Endpoint**: `/ratinglist/metadata`
 - **Method**: GET
 - **Response**: Information about last updates and player counts
 
-### Manual Update
-- **Endpoint**: `/ratinglist/update`
-- **Method**: POST
-- **Query Parameters**:
-  - `source`: "fide", "cfc", or "all" (default: "all")
-- **Response**: Status of update process
-
-### Reset Database
-- **Endpoint**: `/ratinglist/reset`
-- **Method**: POST
-- **Response**: Status of reset operation
-
-### Health Check
+#### Health Check
 - **Endpoint**: `/health`
 - **Method**: GET
 - **Response**: Health status information about the API and its dependencies

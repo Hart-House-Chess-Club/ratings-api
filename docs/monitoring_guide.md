@@ -80,10 +80,16 @@ Example response:
    You should see a Python process running for the updater service.
 
 3. **Manual Updates**:
-   If automatic updates are failing, trigger a manual update:
+   If automatic updates are failing, use the command-line approach:
+   ```bash
+   # For FIDE updates
+   docker exec fide-api python -c "from src.scraper.ratinglists.updater import update_fide_rating_list; update_fide_rating_list()"
+   
+   # For CFC updates
+   docker exec fide-api python -c "from src.scraper.ratinglists.updater import update_cfc_rating_list; update_cfc_rating_list()"
    ```
-   POST /ratinglist/update
-   ```
+   
+   Note: The API endpoints for manual updates (`POST /update` and `POST /ratinglist/reset`) are currently disabled.
 
 ## Troubleshooting
 

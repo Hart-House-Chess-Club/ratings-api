@@ -1,5 +1,5 @@
 <h1 align="center">
-  FIDE API
+  Chess Ratings API
 </h1>
 
 <h4 align="center">Python FIDE scraper, FIDE Ratings API, CFC Ratings API, and available in a web-based HTTP API</h4>
@@ -18,6 +18,8 @@
 
 Working with FIDE official data is not simple, mainly because they don't have an API. That's the reason I made a simple API with FastAPI to scrape the data from their own website and provide it as JSON over HTTP requests.
 
+Similarly, no publicly available API is currently available for CFC ratings. We aim to change that with this project.
+
 A Redis cache is implemented to provide faster lookups for common use cases. Additionally, the API now includes MongoDB integration for storing and querying FIDE and CFC rating lists, with automatic periodic updates. 
 
 A mongodb server is used for storing latest CFC and FIDE ratings. 
@@ -25,18 +27,19 @@ A mongodb server is used for storing latest CFC and FIDE ratings.
 ## Features
 
 Check it on:
-[https://fide-api.vercel.app/docs](https://fide-api.vercel.app/docs)
+[https://ratings.chesstools.org](https://ratings.chesstools.org)
 
 ### FIDE Web Scraping
-- Get top players list
-- Get player info
-- Get player history
+- Get top active players list
+- Get detailed player information
+- Get player rating history
 
 ### Rating List Database
 - Query FIDE rating list data
 - Query CFC rating list data
 - Search for players by name
-- Auto-updating rating lists
+- View top-rated players
+- Health monitoring
 
 For detailed documentation, see:
 - [Rating Lists Documentation](docs/rating_lists.md)
@@ -139,21 +142,26 @@ This project is configured for easy deployment to any Linux server using Docker:
 
 ## API Endpoints
 
-### Original FIDE API Endpoints
-- `GET /top_players/` - Get a list of top FIDE players
-- `GET /player_history/` - Get a player's rating history
-- `GET /player_info/` - Get detailed player information
+### FIDE API Endpoints
+- `GET /fide/top_active/` - Get a list of top active FIDE players
+- `GET /fide/top_by_rating` - Get top rated FIDE players from the database
+- `GET /fide/player_history/` - Get a player's rating history
+- `GET /fide/player_info/` - Get detailed player information
+- `GET /fide/{player_id}` - Get a FIDE player's rating data from the database
 
-### Rating List API Endpoints
-- `GET /ratinglist/fide/{player_id}` - Get a FIDE player's rating data
-- `GET /ratinglist/cfc/{player_id}` - Get a CFC player's rating data
-- `GET /ratinglist/fide/top` - Get top rated FIDE players
-- `GET /ratinglist/cfc/top` - Get top rated CFC players
-- `GET /ratinglist/search` - Search for players by name
+### CFC API Endpoints
+- `GET /cfc/top_by_rating` - Get top rated CFC players from the database
+- `GET /cfc/{player_id}` - Get a CFC player's rating data from the database
+
+### General Endpoints
+- `GET /ratinglist/search` - Search for players by name in either FIDE or CFC rating lists
 - `GET /ratinglist/metadata` - Get rating list metadata
-- `POST /ratinglist/update` - Trigger manual update of rating lists
-- `POST /ratinglist/reset` - Reset rating lists database
 - `GET /health` - Check API and service health status
+
+### System Endpoints (Currently Disabled)
+The following endpoints are currently disabled:
+- `POST /update` - Trigger manual update of rating lists (admin only)
+- `POST /ratinglist/reset` - Reset rating lists database (admin only)
 
 ## Rating List Data Sources
 
