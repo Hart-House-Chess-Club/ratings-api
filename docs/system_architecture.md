@@ -118,14 +118,14 @@ The project includes GitHub Actions workflow for continuous deployment:
 - **Source**: Monthly ZIP file from FIDE
 - **Update Schedule**: 1st of each month
 - **Process**: Download > Extract > Parse > Store
-- **Volume**: Approximately 350,000 players
+- **Volume**: Approximately 500,000 active players
 
 ### CFC Rating List
 
 - **Source**: Weekly CSV file from CFC website
 - **Update Schedule**: Every Monday
 - **Process**: Download > Parse > Store
-- **Volume**: Approximately 10,000 players
+- **Volume**: Approximately 40,000 players (including inactive)
 
 ## Security Considerations
 
@@ -135,7 +135,7 @@ The current implementation includes:
 2. **No Authentication**: Currently public API without rate limiting
 3. **Admin Endpoints**: Should be secured in production
 
-Recommended improvements:
+Future improvements:
 
 1. Add API key authentication for admin endpoints
 2. Implement rate limiting
