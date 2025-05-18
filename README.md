@@ -20,9 +20,9 @@ Working with FIDE official data is not simple, mainly because they don't have an
 
 Similarly, no publicly available API is currently available for CFC ratings. We aim to change that with this project.
 
-A Redis cache is implemented to provide faster lookups for common use cases. Additionally, the API now includes MongoDB integration for storing and querying FIDE and CFC rating lists, with automatic periodic updates. 
+A Redis cache is implemented to provide faster lookups for common use cases. Additionally, the API now includes MongoDB integration for storing and querying FIDE, CFC, and USCF rating lists, with automatic periodic updates. 
 
-A mongodb server is used for storing latest CFC and FIDE ratings. 
+A MongoDB server is used for storing the latest FIDE, CFC, and USCF ratings. 
 
 ## Features
 
@@ -37,6 +37,7 @@ Check it on:
 ### Rating List Database
 - Query FIDE rating list data
 - Query CFC rating list data
+- Query USCF rating list data
 - Search for players by name
 - View top-rated players
 - Health monitoring
@@ -85,7 +86,7 @@ pip install -r requirements.txt
 # Make sure you have MongoDB installed or running via Docker
 
 # Initialize rating lists (optional)
-python initialize_rating_lists.sh
+./initialize_rating_lists.sh
 
 # Start the API server
 uvicorn src.api:app --reload
@@ -118,10 +119,19 @@ This project is configured for easy deployment to any Linux server using Docker:
      - MongoDB for rating list storage
 
    - Alternative (with MongoDB Atlas): 
-   - The `mongo-docker-compose.yml` includes
+   - The `mongo-docker-compose.yml` includes:
       - Cloud-based MongoDB
    
-   For deployments involving MongoDB, ensure that the MONGO_URI is set correctly. 
+   For deployments involving MongoDB Atlas, ensure that the MONGO_URI is set correctly:
+   - Create a `.env` file in the same directory as your docker-compose file with:
+     ```
+     MONGO_TOKEN=your_mongodb_connection_string
+     ```
+   - Or set it in your environment before running docker compose:
+     ```sh
+     export MONGO_TOKEN=your_mongodb_connection_string
+     docker compose -f mongo-docker-compose.yml up -d --build
+     ```
 
 The MongoDB contains rating lists corresponding to respective ratings files such as cfc_ratings for CFC ratings.
 
@@ -178,7 +188,7 @@ The MongoDB contains rating lists corresponding to respective ratings files such
 | `REDIS_HOST` | Redis server host | `localhost` |
 | `REDIS_PORT` | Redis server port | `6379` |
 | `CACHE_EXPIRY` | Cache expiration time in seconds | `3600` |
-| `MONGO_URI` | MongoDB connection URI | `MONGO_DB_TOKEN` |
+| `MONGO_URI` | MongoDB connection URI | `mongodb://localhost:27017` |
 | `MONGO_DB` | MongoDB database name | `fide_api` |
 
 ## Credits
