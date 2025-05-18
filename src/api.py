@@ -80,7 +80,7 @@ async def get_top_uscf_players(limit: int = 100):
   return ratings_db.get_top_rated_uscf(limit)
 
 @app.get("/uscf/{player_id}", tags=["USCF"])
-async def get_uscf_player_rating(player_id: str):
+async def get_uscf_player_rating(player_id: int):
   """Get a USCF player's rating data from the rating list database."""
   player = ratings_db.get_uscf_player(player_id)
   if not player:

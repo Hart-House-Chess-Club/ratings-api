@@ -92,13 +92,13 @@ def get_cfc_player(cfc_id: str) -> Optional[Dict[str, Any]]:
         print(f"Error retrieving CFC player: {e}")
         return None
 
-def get_uscf_player(cfc_id: str) -> Optional[Dict[str, Any]]:
-    """Get CFC player rating data by ID"""
+def get_uscf_player(uscf_id: int) -> Optional[Dict[str, Any]]:
+    """Get USCF player rating data by ID"""
     if not mongo_enabled:
         return None
     
     try:
-        player_data = uscf_collection.find_one({"USCF Member": cfc_id})
+        player_data = uscf_collection.find_one({"mem_id": uscf_id})
         return make_json_serializable(player_data)
     except Exception as e:
         print(f"Error retrieving USCF player: {e}")
