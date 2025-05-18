@@ -85,8 +85,13 @@ jobs:
             IMAGE_PATH="ghcr.io/${REPO_OWNER}/${REPO_NAME}"
             echo "Will pull: ${IMAGE_PATH}:latest"
             
+            # Login to GitHub Container Registry using PAT
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+            
             # Pull the latest image
-            docker pull ${IMAGE_PATH}:latest || echo "Docker pull failed, will try to continue"
+            docker pull ${IMAGE_PATH}:latest || {
+              echo "Docker pull failed, proceeding with local image if available"
+            }
             
             # Create or update docker compose.yml
             cat > ~/fide-api-docker-compose.yml << EOL
