@@ -2,7 +2,7 @@
   Chess Ratings API
 </h1>
 
-<h4 align="center">Python FIDE scraper, FIDE Ratings API, CFC Ratings API, and available in a web-based HTTP API</h4>
+<h4 align="center">Python FIDE scraper for FIDE Ratings, CFC Ratings, and USCF ratings available in a web-based format</h4>
 
 <p align="center">
   <a href="#about">About</a> •
@@ -12,7 +12,7 @@
   <a href="#license">License</a>
 </p>
 
-![screenshot](screenshot.jpg)
+![screenshot](docs/chess-ratings-api.png)
 
 ## About
 
@@ -53,7 +53,7 @@ For detailed documentation, see:
 You will need docker and docker-compose installed, from your terminal:
 
 ```sh
-git clone https://github.com/cassiofb-dev/fide-api
+git clone https://github.com/Hart-House-Chess-Club/ratings-api
 
 cd fide-api
 
@@ -71,7 +71,7 @@ docker exec -d fide-api /app/start_updater_service.sh
 You will need git and python installed, from your terminal:
 
 ```sh
-git clone https://github.com/cassiofb-dev/fide-api
+git clone https://github.com/Hart-House-Chess-Club/ratings-api
 
 cd fide-api
 
@@ -119,8 +119,7 @@ This project is configured for easy deployment to any Linux server using Docker:
 
    - Alternative (with MongoDB Atlas): 
    - The `mongo-docker-compose.yml` includes
-      - FIDE API service
-      - Redis for caching
+      - Cloud-based MongoDB
    
    For deployments involving MongoDB, ensure that the MONGO_URI is set correctly. 
 
@@ -157,20 +156,20 @@ The MongoDB contains rating lists corresponding to respective ratings files such
 - `GET /cfc/top_by_rating` - Get top rated CFC players from the database
 - `GET /cfc/{player_id}` - Get a CFC player's rating data from the database
 
+### USCF API Endpoints
+- `GET /uscf/top_by_rating` - Get top rated USCF players from the database
+- `GET /uscf/{player_id}` - Get a USCF player's rating data from the database
+
 ### General Endpoints
 - `GET /ratinglist/search` - Search for players by name in either FIDE or CFC rating lists
 - `GET /ratinglist/metadata` - Get rating list metadata
 - `GET /health` - Check API and service health status
 
-### System Endpoints (Currently Disabled)
-The following endpoints are currently disabled:
-- `POST /update` - Trigger manual update of rating lists (admin only)
-- `POST /ratinglist/reset` - Reset rating lists database (admin only)
-
 ## Rating List Data Sources
 
 - FIDE Rating List: Downloaded from `https://ratings.fide.com/download/standard_rating_list_xml.zip`
 - CFC Rating List: Downloaded from `https://storage.googleapis.com/cfc-public/data/tdlist.txt`
+- USCF Rating List: Downloaded from `https://www.kingregistration.com/combineddb`
 
 ## Environment Variables
 
@@ -179,34 +178,14 @@ The following endpoints are currently disabled:
 | `REDIS_HOST` | Redis server host | `localhost` |
 | `REDIS_PORT` | Redis server port | `6379` |
 | `CACHE_EXPIRY` | Cache expiration time in seconds | `3600` |
-| `MONGO_URI` | MongoDB connection URI | `mongodb://localhost:27017/` |
+| `MONGO_URI` | MongoDB connection URI | `MONGO_DB_TOKEN` |
 | `MONGO_DB` | MongoDB database name | `fide_api` |
-| `FIDE_DOWNLOAD_URL` | URL to download FIDE rating list | `https://ratings.fide.com/download/standard_rating_list_xml.zip` |
-| `CFC_DOWNLOAD_URL` | URL to download CFC rating list | `https://storage.googleapis.com/cfc-public/data/tdlist.txt` |
 
 ## Credits
 
-This project uses git, python, Redis, and MongoDB.
-
-The following key python dependencies are used:
-```txt
-annotated-types==0.7.0
-anyio==4.6.0
-beautifulsoup4==4.12.3
-fastapi==0.115.0
-orjson==3.10.7
-pandas==2.2.1
-pymongo==4.6.1
-pydantic==2.9.2
-redis==6.0.0
-requests==2.32.3
-schedule==1.2.1
-uvicorn==0.31.0
-xmltodict==0.13.0
-```
+Original FIDE-API available from: [fide-api](https://github.com/cassiofb-dev/fide-api/)
 
 ## License
 
 MIT
 
----

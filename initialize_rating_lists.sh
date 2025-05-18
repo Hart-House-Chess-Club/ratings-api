@@ -27,18 +27,18 @@ logger = logging.getLogger('rating_list_init')
 logger.info("Starting rating list initialization...")
 
 # First reset collections to ensure clean state
-# logger.info("Resetting database collections...")
-# reset_result = reset_collections()
-# logger.info(f"Reset result: {'Successful' if reset_result else 'Failed'}")
+logger.info("Resetting database collections...")
+reset_result = reset_collections()
+logger.info(f"Reset result: {'Successful' if reset_result else 'Failed'}")
 
 # Step 1: Try to download the latest rating lists
 logger.info("Downloading latest rating lists...")
-# cfc_update = update_cfc_rating_list()
-# fide_update = update_fide_rating_list()
+cfc_update = update_cfc_rating_list()
+fide_update = update_fide_rating_list()
 uscf_update = update_uscf_rating_list()
 
-# logger.info(f"FIDE parsing: {'Successful' if fide_update else 'Failed'}")
-# logger.info(f"CFC parsing: {'Successful' if cfc_update else 'Failed'}")
+logger.info(f"FIDE parsing: {'Successful' if fide_update else 'Failed'}")
+logger.info(f"CFC parsing: {'Successful' if cfc_update else 'Failed'}")
 logger.info(f"USCF parsing: {'Successful' if uscf_update else 'Failed'}")
 
 logger.info("Rating list initialization completed!")
