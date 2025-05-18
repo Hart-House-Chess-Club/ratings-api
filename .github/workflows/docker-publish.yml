@@ -73,8 +73,10 @@ jobs:
             # Clone or update the repository on the server
             cd ~/fide-api/ratings-api
             git pull
+            
+            # Create .env file with secrets
+            echo "MONGO_TOKEN=${{ secrets.MONGO_TOKEN }}" > .env
                         
             # Run with docker compose
             docker compose -f mongo-docker-compose.yml down || echo "No previous containers to remove"
-            export MONGO_TOKEN="${{ secrets.MONGO_TOKEN }}"
-            docker compose -f mongo-docker-compose.yml up -d
+            docker compose -f mongo-docker-compose.yml up -d --build

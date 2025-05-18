@@ -154,7 +154,7 @@ async def health_check():
     
     # Check MongoDB connection
     try:
-        mongo_uri = os.environ.get("MONGO_URI", "MONGO_TOKEN")
+        mongo_uri = os.environ.get("MONGO_URI", "mongodb://localhost:27017")
         mongo_client = pymongo.MongoClient(mongo_uri, serverSelectionTimeoutMS=2000)
         server_info = mongo_client.server_info()
         fide_count = ratings_db.fide_collection.count_documents({})
