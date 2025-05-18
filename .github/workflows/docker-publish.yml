@@ -70,18 +70,30 @@ jobs:
           key: ${{ secrets.HOST_KEY }}
           port: ${{ secrets.HOST_PORT }}
           script: |
-            # Get lowercase repository name
-            REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+            # cd into the right directory
+            cd ~/fide-api/ratings-api || exit 1
+
+            # Debug - show what we're trying to pull
+            echo "Repo owner: ${{ github.repository_owner }}"
+            echo "Repo name: ${{ github.event.repository.name }}"
+            
+            # Get lowercase repository parts
+            REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+            REPO_NAME=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+            
+            # Use the same format as in the build step
+            IMAGE_PATH="ghcr.io/${REPO_OWNER}/${REPO_NAME}"
+            echo "Will pull: ${IMAGE_PATH}:latest"
             
             # Pull the latest image
-            docker pull ghcr.io/$REPO_LOWER:latest
+            docker pull ${IMAGE_PATH}:latest || echo "Docker pull failed, will try to continue"
             
             # Create or update docker compose.yml
-            cat > ~/fide-api-docker-compose.yml << 'EOL'
+            cat > ~/fide-api-docker-compose.yml << EOL
             services:
               fide-api:
                 container_name: fide-api
-                image: ghcr.io/${REPO_LOWER}:latest
+                image: ${IMAGE_PATH}:latest
                 restart: always
                 ports:
                   - "8000:8000"
@@ -109,9 +121,10 @@ jobs:
               redis-data:
             EOL
             
-            # Fix the environment variable in the generated file
-            sed -i "s|\${REPO_LOWER}|$REPO_LOWER|g" ~/fide-api-docker-compose.yml
+            # Check if docker-compose file was created correctly
+            echo "Created docker-compose file:"
+            cat ~/fide-api-docker-compose.yml
             
             # Run with docker-compose
-            docker compose -f ~/fide-api-docker-compose.yml down
+            docker compose -f ~/fide-api-docker-compose.yml down || echo "No previous containers to remove"
             docker compose -f ~/fide-api-docker-compose.yml up -d
