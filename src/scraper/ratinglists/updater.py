@@ -194,11 +194,38 @@ def download_uscf_file(url: str, file_path: str) -> bool:
         # Download with streaming and proper headers
         with requests.get(url, stream=True, headers=headers) as response:
             response.raise_for_status()
-            with open(file_path, 'wb') as file:
+            # First save the zip file to a temporary path
+            zip_path = file_path + ".zip"
+            with open(zip_path, 'wb') as file:
                 for chunk in response.iter_content(chunk_size=8192):
                     file.write(chunk)
         
-        logger.info(f"USCF download completed: {file_path}")
+        logger.info(f"USCF download completed: {zip_path}")
+        
+        # Extract the zip file
+        try:
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                # List all files in the ZIP
+                file_list = zip_ref.namelist()
+                logger.info(f"USCF ZIP contains: {file_list}")
+                
+                # Find the DBF file
+                dbf_files = [f for f in file_list if f.endswith('.dbf')]
+                if not dbf_files:
+                    logger.error("No DBF files found in USCF ZIP archive")
+                    return False
+                
+                # Extract the DBF file and rename it to the target path
+                zip_ref.extract(dbf_files[0], os.path.dirname(file_path))
+                extracted_path = os.path.join(os.path.dirname(file_path), dbf_files[0])
+                os.rename(extracted_path, file_path)
+                
+                # Remove the temporary zip file
+                os.remove(zip_path)
+                logger.info(f"USCF data extracted to {file_path}")
+        except Exception as e:
+            logger.error(f"Error extracting USCF zip file: {e}")
+            return False
         return True
     except requests.exceptions.HTTPError as e:
         logger.error(f"HTTP error downloading USCF data: {e}")
@@ -222,11 +249,12 @@ def update_uscf_rating_list() -> bool:
     logger.info("Starting USCF rating list update...")
     
     # Use the special download function for USCF
-    # if not download_uscf_file(USCF_DOWNLOAD_URL, USCF_FILE_PATH):
-    #     logger.error("Failed to download USCF rating list")
-    #     return False
+    if not download_uscf_file(USCF_DOWNLOAD_URL, USCF_FILE_PATH):
+        logger.error("Failed to download USCF rating list")
+        return False
     
     # Parse and update database
+    return True
     success = parse_uscf_rating_list(USCF_FILE_PATH)
     
     if success:
