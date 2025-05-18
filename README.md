@@ -124,6 +124,10 @@ This project is configured for easy deployment to any Linux server using Docker:
    
    For deployments involving MongoDB, ensure that the MONGO_URI is set correctly. 
 
+The MongoDB contains rating lists corresponding to respective ratings files such as cfc_ratings for CFC ratings.
+
+![screenshot](docs/mongo.png)
+
 4. **Maintenance Commands**:
    - Reset the MongoDB database: `docker exec fide-api python reset_mongodb.py`
    - Check logs: `docker logs fide-api`
