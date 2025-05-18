@@ -6,10 +6,11 @@ from pymongo.collection import Collection
 from typing import Optional, Dict, Any, List, Union
 
 # MongoDB configuration - using environment variables with sensible defaults
-MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/')
+MONGO_URI = os.environ.get('MONGO_URI', 'MONGO_TOKEN')
 MONGO_DB = os.environ.get('MONGO_DB', 'fide_api')
 MONGO_FIDE_COLLECTION = os.environ.get('MONGO_FIDE_COLLECTION', 'fide_ratings')
 MONGO_CFC_COLLECTION = os.environ.get('MONGO_CFC_COLLECTION', 'cfc_ratings')
+MONGO_USCF_COLLECTION = os.environ.get('MONGO_USCF_COLLECTION', 'uscf_ratings')
 MONGO_METADATA_COLLECTION = os.environ.get('MONGO_METADATA_COLLECTION', 'metadata')
 
 # Initialize MongoDB client
@@ -18,6 +19,7 @@ try:
     db = client[MONGO_DB]
     fide_collection = db[MONGO_FIDE_COLLECTION]
     cfc_collection = db[MONGO_CFC_COLLECTION]
+    uscf_collection = db[MONGO_USCF_COLLECTION]
     metadata_collection = db[MONGO_METADATA_COLLECTION]
     
     # Create indexes for better query performance
@@ -30,6 +32,11 @@ try:
     cfc_collection.create_index([("FIDE Number", ASCENDING)])
     cfc_collection.create_index([("Rating", DESCENDING)])
     cfc_collection.create_index([("Last", "text"), ("First", "text")])
+
+    uscf_collection.create_index([("USCF Number", ASCENDING)], unique=True)
+    uscf_collection.create_index([("FIDE Number", ASCENDING)])
+    uscf_collection.create_index([("Rating", DESCENDING)])
+    uscf_collection.create_index([("Last", "text"), ("First", "text")])
     
     mongo_enabled = True
     print("MongoDB connection established successfully")
@@ -85,6 +92,18 @@ def get_cfc_player(cfc_id: str) -> Optional[Dict[str, Any]]:
         print(f"Error retrieving CFC player: {e}")
         return None
 
+def get_uscf_player(cfc_id: str) -> Optional[Dict[str, Any]]:
+    """Get CFC player rating data by ID"""
+    if not mongo_enabled:
+        return None
+    
+    try:
+        player_data = uscf_collection.find_one({"USCF Member": cfc_id})
+        return make_json_serializable(player_data)
+    except Exception as e:
+        print(f"Error retrieving USCF player: {e}")
+        return None
+
 
 def get_top_rated_fide(limit: int = 100) -> List[Dict[str, Any]]:
     """Get top rated FIDE players"""
@@ -117,6 +136,18 @@ def get_top_rated_cfc(limit: int = 100) -> List[Dict[str, Any]]:
         print(f"Error retrieving top CFC players: {e}")
         return []
 
+def get_top_rated_uscf(limit: int = 100) -> List[Dict[str, Any]]:
+    """Get top rated USCF players"""
+    if not mongo_enabled:
+        return []
+    
+    try:
+        players = list(uscf_collection.find().sort("rating", DESCENDING).limit(limit))
+        return make_json_serializable(players)
+    except Exception as e:
+        print(f"Error retrieving top USCF players: {e}")
+        return []
+
 
 def search_player(query: str, collection: str = "fide") -> List[Dict[str, Any]]:
     """Search for players by name"""
@@ -126,8 +157,10 @@ def search_player(query: str, collection: str = "fide") -> List[Dict[str, Any]]:
     try:
         if collection.lower() == "fide":
             players = list(fide_collection.find({"$text": {"$search": query}}).limit(20))
-        else:
+        elif collection.lower() == "cfc":
             players = list(cfc_collection.find({"$text": {"$search": query}}).limit(20))
+        else:
+            players = list(uscf_collection.find({"$text": {"$search": query}}).limit(20))
             
         return make_json_serializable(players)
     except Exception as e:

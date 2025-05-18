@@ -39,8 +39,8 @@ volumes:
 EOL
 
 # Run with docker-compose
-docker-compose -f ~/fide-api-docker-compose.yml down
-docker-compose -f ~/fide-api-docker-compose.yml up -d
+docker compose -f mongo-docker-compose.yml down
+docker compose -f mongo-docker-compose.yml up -d
 
 # Initialize rating lists if needed (using sh for Alpine compatibility)
 echo "Initializing rating lists (this may take a while if files need to be downloaded)..."

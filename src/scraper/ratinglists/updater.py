@@ -19,7 +19,7 @@ except ImportError:
     SCHEDULE_AVAILABLE = False
     print("Schedule package not installed. Automatic scheduling not available.")
 
-from src.scraper.ratinglists.parsers import parse_fide_rating_list, parse_cfc_rating_list
+from src.scraper.ratinglists.parsers import parse_fide_rating_list, parse_cfc_rating_list, parse_uscf_rating_list
 from src.scraper.ratinglists.db import metadata_collection, mongo_enabled
 
 # Configure logging
@@ -35,11 +35,16 @@ RATING_LIST_DIR = "rating-lists"
 FIDE_ZIP_PATH = os.path.join(RATING_LIST_DIR, "standard_rating_list_xml.zip")
 FIDE_XML_PATH = os.path.join(RATING_LIST_DIR, "standard_rating_list.xml")
 CFC_FILE_PATH = os.path.join(RATING_LIST_DIR, "tdlist.txt")
+USCF_FILE_PATH = os.path.join(RATING_LIST_DIR, "uscffide.dbf")
 
 # URLs for downloading rating lists
 FIDE_DOWNLOAD_URL = os.environ.get(
     "FIDE_DOWNLOAD_URL", 
     "https://ratings.fide.com/download/standard_rating_list_xml.zip"
+)
+USCF_DOWNLOAD_URL = os.environ.get(
+    "USCF_DOWNLOAD_URL",
+    "https://www.kingregistration.com/combineddb/db"
 )
 CFC_DOWNLOAD_URL = os.environ.get(
     "CFC_DOWNLOAD_URL",
@@ -162,6 +167,74 @@ def update_fide_rating_list() -> bool:
     
     return success
 
+def download_uscf_file(url: str, file_path: str) -> bool:
+    """Special download function for USCF rating list which requires specific headers.
+    
+    Args:
+        url: The URL to download from
+        file_path: Where to save the file
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        # Make sure directory exists
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        
+        logger.info(f"Downloading USCF data from {url} to {file_path}")
+        
+        # Add special headers that mimic a browser request
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Accept': 'application/octet-stream',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive'
+        }
+        
+        # Download with streaming and proper headers
+        with requests.get(url, stream=True, headers=headers) as response:
+            response.raise_for_status()
+            with open(file_path, 'wb') as file:
+                for chunk in response.iter_content(chunk_size=8192):
+                    file.write(chunk)
+        
+        logger.info(f"USCF download completed: {file_path}")
+        return True
+    except requests.exceptions.HTTPError as e:
+        logger.error(f"HTTP error downloading USCF data: {e}")
+        if e.response.status_code == 406:
+            logger.error("Received 406 Not Acceptable error. The server likely requires specific headers or browser identification.")
+        return False
+    except Exception as e:
+        logger.error(f"Error downloading USCF data from {url}: {e}")
+        return False
+
+
+def update_uscf_rating_list() -> bool:
+    """Update the USCF rating list.
+    
+    1. Download the latest file
+    2. Parse and update the database
+    
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    logger.info("Starting USCF rating list update...")
+    
+    # Use the special download function for USCF
+    # if not download_uscf_file(USCF_DOWNLOAD_URL, USCF_FILE_PATH):
+    #     logger.error("Failed to download USCF rating list")
+    #     return False
+    
+    # Parse and update database
+    success = parse_uscf_rating_list(USCF_FILE_PATH)
+    
+    if success:
+        logger.info("USCF rating list update completed successfully")
+    else:
+        logger.error("Failed to parse USCF rating list")
+    
+    return success
 
 def update_cfc_rating_list() -> bool:
     """Update the CFC rating list.
@@ -198,7 +271,8 @@ def update_all_rating_lists() -> Dict[str, bool]:
     """
     results = {
         "fide": update_fide_rating_list(),
-        "cfc": update_cfc_rating_list()
+        "cfc": update_cfc_rating_list(),
+        "uscf": update_uscf_rating_list()
     }
     return results
 

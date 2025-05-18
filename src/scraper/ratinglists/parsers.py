@@ -7,10 +7,13 @@ import datetime
 import pandas as pd
 from typing import Dict, List, Any, Optional
 from pymongo.collection import Collection
+import dbfread
 
+from src.scraper.ratinglists.custom_dbf_parser import CustomFieldParser
 from src.scraper.ratinglists.db import (
     fide_collection,
     cfc_collection,
+    uscf_collection,
     metadata_collection,
     mongo_enabled
 )
@@ -51,6 +54,74 @@ def extract_zip(zip_path: str, extract_dir: str) -> str:
     except Exception as e:
         print(f"Error extracting ZIP file {zip_path}: {e}")
         return None
+    
+def parse_uscf_rating_list(file_path: str = "rating-lists/uscffide.dbf") -> bool:
+    """Parse the USCF rating list DBF file and store in MongoDB.
+    
+    Returns True if successful, False otherwise.
+    """
+    if not mongo_enabled:
+        print("MongoDB not enabled, skipping USCF rating list parsing")
+        return False
+    
+    try:
+        # Check if file exists
+        if not os.path.exists(file_path):
+            print(f"USCF rating list file not found at {file_path}")
+            return False
+        
+        print(f"Starting to parse USCF rating list from {file_path}...")
+        
+        # Read the DBF file
+        # with open(file_path, 'rb') as file:
+            # Use a library like simpledbf or dbfread to read DBF files
+            
+        # Read the DBF file with Latin-1 encoding to handle special characters
+        dbf = dbfread.DBF(file_path, encoding='latin1', char_decode_errors='replace')
+        
+        # Process records
+        player_count = 0
+        for record in dbf:
+            try:
+                # Convert to a more MongoDB-friendly format
+                processed_record = {
+                    "mem_id": record.get("MEM_ID", ""),
+                    "name": record.get("MEM_NAME", ""),
+                    "fideid": record.get("FIDE_ID", ""),
+                    "rating": int(record.get("R_LPB_RAT", "0") or "0"),
+                    "birth_year": int(record.get("BIRTH_YEAR", "0") or "0"),
+                }
+                
+                # Insert into MongoDB
+                uscf_collection.update_one(
+                    {"USCF Number": processed_record["mem_id"]}, 
+                    {"$set": processed_record}, 
+                    upsert=True
+                )
+                
+                player_count += 1
+                if player_count % 1000 == 0:
+                    print(f"Processed {player_count} USCF players...")
+            except Exception as e:
+                print(f"Error processing USCF record: {e}")
+                continue
+        
+        # Update metadata
+        metadata_collection.update_one(
+            {"_id": "rating_lists"},
+            {"$set": {
+                "uscf_last_updated": datetime.datetime.now(),
+                "uscf_player_count": player_count
+            }},
+            upsert=True
+        )
+        
+        print(f"Successfully parsed USCF rating list: {player_count} players")
+        return True
+        
+    except Exception as e:
+        print(f"Error parsing USCF rating list: {e}")
+        return False
 
 def parse_fide_rating_list(file_path: str = "rating-lists/standard_rating_list_xml.zip") -> bool:
     """Parse the FIDE rating list XML file and store in MongoDB.

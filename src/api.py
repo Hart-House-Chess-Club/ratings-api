@@ -74,6 +74,19 @@ async def get_cfc_player_rating(player_id: str):
     raise HTTPException(status_code=404, detail="Player not found")
   return player
 
+@app.get("/uscf/top_by_rating", tags=["USCF"])
+async def get_top_uscf_players(limit: int = 100):
+  """Get top rated USCF players from the rating list database."""
+  return ratings_db.get_top_rated_uscf(limit)
+
+@app.get("/uscf/{player_id}", tags=["USCF"])
+async def get_uscf_player_rating(player_id: str):
+  """Get a USCF player's rating data from the rating list database."""
+  player = ratings_db.get_uscf_player(player_id)
+  if not player:
+    raise HTTPException(status_code=404, detail="Player not found")
+  return player
+
 @app.get("/ratinglist/search", tags=["All"])
 async def search_players(query: str, list_type: str = "fide"):
   """Search for players by name in either FIDE or CFC rating lists."""
@@ -141,7 +154,7 @@ async def health_check():
     
     # Check MongoDB connection
     try:
-        mongo_uri = os.environ.get("MONGO_URI", "mongodb://localhost:27017/")
+        mongo_uri = os.environ.get("MONGO_URI", "MONGO_TOKEN")
         mongo_client = pymongo.MongoClient(mongo_uri, serverSelectionTimeoutMS=2000)
         server_info = mongo_client.server_info()
         fide_count = ratings_db.fide_collection.count_documents({})
