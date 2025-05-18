@@ -6,7 +6,7 @@ from pymongo.collection import Collection
 from typing import Optional, Dict, Any, List, Union
 
 # MongoDB configuration - using environment variables with sensible defaults
-MONGO_URI = os.environ.get('MONGO_URI', 'MONGO_TOKEN')
+MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017')
 MONGO_DB = os.environ.get('MONGO_DB', 'fide_api')
 MONGO_FIDE_COLLECTION = os.environ.get('MONGO_FIDE_COLLECTION', 'fide_ratings')
 MONGO_CFC_COLLECTION = os.environ.get('MONGO_CFC_COLLECTION', 'cfc_ratings')
