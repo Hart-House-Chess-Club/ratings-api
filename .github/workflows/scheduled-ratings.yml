@@ -28,11 +28,10 @@ jobs:
         fi
         
     - name: Make script executable
-      run: chmod +x ratings-api/initialize_rating_lists.sh
+      run: chmod +x /initialize_rating_lists.sh
       
     - name: Run rating list update
       run: |
-        cd ratings-api
         ./initialize_rating_lists.sh
       env:
         MONGO_URI: ${{ secrets.MONGO_URI }}
