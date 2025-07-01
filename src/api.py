@@ -173,6 +173,33 @@ async def health_check():
         }
         health_status["status"] = "degraded"
     
+    # Get rating list last refresh dates from metadata
+    try:
+        metadata = ratings_db.get_rating_list_metadata()
+        if metadata:
+            rating_lists_status = {}
+            
+            # FIDE last update
+            if "fide_last_updated" in metadata:
+                rating_lists_status["fide_last_refreshed"] = metadata["fide_last_updated"]
+            
+            # CFC last update  
+            if "cfc_last_updated" in metadata:
+                rating_lists_status["cfc_last_refreshed"] = metadata["cfc_last_updated"]
+                
+            # USCF last update
+            if "uscf_last_updated" in metadata:
+                rating_lists_status["uscf_last_refreshed"] = metadata["uscf_last_updated"]
+            
+            if rating_lists_status:
+                health_status["rating_lists"] = rating_lists_status
+                
+    except Exception as e:
+        health_status["rating_lists"] = {
+            "status": "error",
+            "error": f"Could not retrieve metadata: {str(e)}"
+        }
+    
     # Check FIDE website accessibility
     try:
         fide_response = requests.get("https://ratings.fide.com", timeout=5)

@@ -235,6 +235,11 @@ The updater service runs in the background and:
         "status": "ok",
         "status_code": 200
       }
+    },
+    "rating_lists": {
+      "fide_last_refreshed": "2025-07-01T02:52:00.001000",
+      "cfc_last_refreshed": "2025-06-28T15:30:25.123456",
+      "uscf_last_refreshed": "2025-07-01T02:53:00.001000"
     }
   }
   ```
