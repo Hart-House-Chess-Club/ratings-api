@@ -36,7 +36,7 @@ A MongoDB server is used for storing the latest FIDE, CFC, and USCF ratings.
 ## Features
 
 Check it on:
-[https://ratings.chesstools.org](https://ratings.chesstools.org)
+[https://api.chesstools.org](https://api.chesstools.org)
 
 ### Analytics
 - Google Analytics integration for tracking API usage
