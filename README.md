@@ -10,6 +10,7 @@
    <a href="#usage">Usage</a> •
    <a href="#credits">Credits</a> •
    <a href="#license">License</a>
+   <a href="">Health</a>
 </p>
 
 <p align="center">
@@ -38,6 +39,10 @@ A MongoDB server is used for storing the latest FIDE, CFC, and USCF ratings.
 
 Check it on:
 [https://ratings.chesstools.org](https://ratings.chesstools.org)
+
+### Analytics
+- Google Analytics integration for tracking API usage
+- Comprehensive request logging and monitoring
 
 ### FIDE Web Scraping
 - Get top active players list
@@ -74,6 +79,33 @@ docker compose up -d
 docker exec fide-api /app/initialize_rating_lists.sh
 
 ```
+
+## Configuration
+
+### Environment Variables
+
+Create a `.env` file in the project root with the following configuration:
+
+```bash
+# Google Analytics Configuration  
+GA_TRACKING_ID=G-JSFHZ4X5YL
+
+# API Configuration
+API_TITLE=Chess Ratings API
+API_VERSION=2.0.0
+API_DESCRIPTION=Highly reliable, free, chess ratings API for FIDE, CFC, and other rating systems.
+
+# MongoDB Configuration
+MONGO_TOKEN=your_mongodb_connection_string
+
+# Optional: GA4 Measurement Protocol API Secret (for advanced server-side tracking)
+# GA_API_SECRET=your_measurement_protocol_api_secret_here
+```
+
+The Google Analytics integration will automatically track:
+- Page views on the home page and API documentation
+- API endpoint usage and response times
+- User engagement metrics
 
 ## Deployment
 

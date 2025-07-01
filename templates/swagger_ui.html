@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css">
+    <link rel="shortcut icon" href="https://fastapi.tiangolo.com/img/favicon.png">
+    <title>{{title}} - Swagger UI</title>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JSFHZ4X5YL"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-JSFHZ4X5YL');
+    </script>
+</head>
+<body>
+    <div id="swagger-ui">
+    </div>
+    <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
+    <!-- `SwaggerUIBundle` is now available on the page -->
+    <script>
+    const ui = SwaggerUIBundle({
+        url: '{{openapi_url}}',
+        oauth2RedirectUrl: window.location.origin + '/docs/oauth2-redirect',
+        dom_id: '#swagger-ui',
+        presets: [
+        SwaggerUIBundle.presets.standalone,
+        SwaggerUIBundle.presets.apis,
+        SwaggerUIStandalonePreset
+        ],
+        layout: "BaseLayout",
+        deepLinking: true,
+        showExtensions: true,
+        showCommonExtensions: true
+    })
+    </script>
+</body>
+</html>
