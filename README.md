@@ -5,15 +5,22 @@
 <h4 align="center">Python FIDE scraper for FIDE Ratings, CFC Ratings, and USCF ratings available in a web-based format</h4>
 
 <p align="center">
-  <a href="#about">About</a> •
-  <a href="#features">Features</a> •
-  <a href="#usage">Usage</a> •
-  <a href="#credits">Credits</a> •
-  <a href="#license">License</a>
+   <a href="#about">About</a> •
+   <a href="#features">Features</a> •
+   <a href="#usage">Usage</a> •
+   <a href="#credits">Credits</a> •
+   <a href="#license">License</a>
 </p>
 
-[![Docker Build and Deploy](https://github.com/Hart-House-Chess-Club/ratings-api/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/Hart-House-Chess-Club/ratings-api/actions/workflows/docker-publish.yml) 
-[![Update Rating Lists](https://github.com/Hart-House-Chess-Club/ratings-api/actions/workflows/scheduled-ratings.yml/badge.svg)](https://github.com/Hart-House-Chess-Club/ratings-api/actions/workflows/scheduled-ratings.yml)
+<p align="center">
+   <a href="https://github.com/Hart-House-Chess-Club/ratings-api/actions/workflows/docker-publish.yml">
+      <img src="https://github.com/Hart-House-Chess-Club/ratings-api/actions/workflows/docker-publish.yml/badge.svg" alt="Docker Build and Deploy">
+   </a>
+   <a href="https://github.com/Hart-House-Chess-Club/ratings-api/actions/workflows/scheduled-ratings.yml">
+      <img src="https://github.com/Hart-House-Chess-Club/ratings-api/actions/workflows/scheduled-ratings.yml/badge.svg" alt="Update Rating Lists">
+   </a>
+</p>
+
 
 ![screenshot](docs/chess-ratings-api.png)
 

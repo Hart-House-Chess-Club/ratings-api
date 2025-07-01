@@ -34,8 +34,7 @@ jobs:
       run: |
         ./initialize_rating_lists.sh
       env:
-        MONGO_URI: ${{ secrets.MONGO_URI }}
-        MONGO_DB: ${{ secrets.MONGO_DB || 'fide_api' }}
+        MONGO_URI: ${{ secrets.MONGO_TOKEN }}
         
     - name: Check for errors
       if: failure()
