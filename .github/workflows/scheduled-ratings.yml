@@ -20,7 +20,14 @@ jobs:
         port: ${{ secrets.HOST_PORT }}
         script: |
           cd ~/fide-api/ratings-api
-          ./initialize_rating_lists.sh
+          docker exec fide-api python -c "
+          import sys
+          sys.path.append('/app')
+          from src.scraper.ratinglists.updater import update_all_rating_lists
+          print('Starting rating list update...')
+          update_all_rating_lists()
+          print('Rating list update completed!')
+          "
         
     - name: Check for errors
       if: failure()

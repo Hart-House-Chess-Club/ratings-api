@@ -18,7 +18,7 @@ COPY . .
 RUN mkdir -p rating-lists
 
 # Make scripts executable
-RUN chmod +x initialize_rating_lists.sh start_updater_service.sh
+RUN chmod +x initialize_rating_lists.sh
 
 # Add wget for health checks
 RUN apk add --no-cache wget

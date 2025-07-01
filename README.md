@@ -73,8 +73,6 @@ docker compose up -d
 # Initialize rating lists (this may take some time on first run)
 docker exec fide-api /app/initialize_rating_lists.sh
 
-# Start the updater service for automatic updates
-docker exec -d fide-api /app/start_updater_service.sh
 ```
 
 ## Deployment
