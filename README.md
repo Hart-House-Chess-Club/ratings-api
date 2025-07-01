@@ -12,6 +12,9 @@
   <a href="#license">License</a>
 </p>
 
+[![Docker Build and Deploy](https://github.com/Hart-House-Chess-Club/ratings-api/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/Hart-House-Chess-Club/ratings-api/actions/workflows/docker-publish.yml) 
+[![Update Rating Lists](https://github.com/Hart-House-Chess-Club/ratings-api/actions/workflows/scheduled-ratings.yml/badge.svg)](https://github.com/Hart-House-Chess-Club/ratings-api/actions/workflows/scheduled-ratings.yml)
+
 ![screenshot](docs/chess-ratings-api.png)
 
 ## About
@@ -67,33 +70,6 @@ docker exec fide-api /app/initialize_rating_lists.sh
 docker exec -d fide-api /app/start_updater_service.sh
 ```
 
-### Native
-
-You will need git and python installed, from your terminal:
-
-```sh
-git clone https://github.com/Hart-House-Chess-Club/ratings-api
-
-cd fide-api
-
-python -m venv venv
-
-source venv/bin/activate
-
-pip install -r requirements.txt
-
-# Start MongoDB (required for rating list features)
-# Make sure you have MongoDB installed or running via Docker
-
-# Initialize rating lists (optional)
-./initialize_rating_lists.sh
-
-# Start the API server
-uvicorn src.api:app --reload
-```
-
-To see the docs go to ``localhost:8000/docs``
-
 ## Deployment
 
 ### Docker Deployment to Linux Server
@@ -104,6 +80,7 @@ This project is configured for easy deployment to any Linux server using Docker:
    - The repository includes a GitHub Actions workflow file for CI/CD
    - Each push to the main branch triggers an automatic build and deployment
    - See `.github/workflows/docker-publish.yml` for workflow details
+   - See `.github/workflows/update-rating-lists.yml` for updating the rating lists automatically
 
 2. **Manual Deployment**:
    - Use the included `deploy.sh` script:
@@ -137,59 +114,6 @@ The MongoDB contains rating lists corresponding to respective ratings files such
 
 ![screenshot](docs/mongo.png)
 
-4. **Maintenance Commands**:
-   - Reset the MongoDB database: `docker exec fide-api python reset_mongodb.py`
-   - Check logs: `docker logs fide-api`
-   - View MongoDB data: `docker exec -it mongodb mongosh fide_api`
-   - Check system health: `curl http://localhost:8000/health`
-
-5. **Monitoring**:
-   - The API includes a `/health` endpoint for system monitoring
-   - Docker health checks are configured for all containers
-   - See [docs/monitoring_guide.md](docs/monitoring_guide.md) for comprehensive monitoring instructions
-
-### Update Schedule
-
-- **FIDE Rating List**: Updates monthly (typical release on the 1st of each month)
-- **CFC Rating List**: Updates weekly
-
-## API Endpoints
-
-### FIDE API Endpoints
-- `GET /fide/top_active/` - Get a list of top active FIDE players
-- `GET /fide/top_by_rating` - Get top rated FIDE players from the database
-- `GET /fide/player_history/` - Get a player's rating history
-- `GET /fide/player_info/` - Get detailed player information
-- `GET /fide/{player_id}` - Get a FIDE player's rating data from the database
-
-### CFC API Endpoints
-- `GET /cfc/top_by_rating` - Get top rated CFC players from the database
-- `GET /cfc/{player_id}` - Get a CFC player's rating data from the database
-
-### USCF API Endpoints
-- `GET /uscf/top_by_rating` - Get top rated USCF players from the database
-- `GET /uscf/{player_id}` - Get a USCF player's rating data from the database
-
-### General Endpoints
-- `GET /ratinglist/search` - Search for players by name in either FIDE or CFC rating lists
-- `GET /ratinglist/metadata` - Get rating list metadata
-- `GET /health` - Check API and service health status
-
-## Rating List Data Sources
-
-- FIDE Rating List: Downloaded from `https://ratings.fide.com/download/standard_rating_list_xml.zip`
-- CFC Rating List: Downloaded from `https://storage.googleapis.com/cfc-public/data/tdlist.txt`
-- USCF Rating List: Downloaded from `https://www.kingregistration.com/combineddb`
-
-## Environment Variables
-
-| Variable | Description | Default |
-| --- | --- | --- |
-| `REDIS_HOST` | Redis server host | `localhost` |
-| `REDIS_PORT` | Redis server port | `6379` |
-| `CACHE_EXPIRY` | Cache expiration time in seconds | `3600` |
-| `MONGO_URI` | MongoDB connection URI | `mongodb://localhost:27017` |
-| `MONGO_DB` | MongoDB database name | `fide_api` |
 
 ## Credits
 

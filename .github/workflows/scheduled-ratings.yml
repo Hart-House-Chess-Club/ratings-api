@@ -28,7 +28,7 @@ jobs:
         fi
         
     - name: Make script executable
-      run: chmod +x /initialize_rating_lists.sh
+      run: chmod +x initialize_rating_lists.sh
       
     - name: Run rating list update
       run: |
