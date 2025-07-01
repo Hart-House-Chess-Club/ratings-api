@@ -83,7 +83,7 @@ async def custom_swagger_ui_html():
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Chess Ratings API - ChessTools</title>
-        <link type="text/css" rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css">
+        <link type="text/css" rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.25.3/swagger-ui.css">
         <link rel="shortcut icon" href="https://fastapi.tiangolo.com/img/favicon.png">
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
@@ -221,17 +221,17 @@ async def custom_swagger_ui_html():
             <div id="swagger-ui" class="bg-card rounded-lg shadow-sm border border-border"></div>
         </div>
         
-        <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
+        <script src="https://unpkg.com/swagger-ui-dist@5.25.3/swagger-ui-bundle.js"></script>
+        <script src="https://unpkg.com/swagger-ui-dist@5.25.3/swagger-ui-standalone-preset.js"></script>
         <script>
         const ui = SwaggerUIBundle({{
             url: '/openapi.json',
             dom_id: '#swagger-ui',
             presets: [
-            SwaggerUIBundle.presets.standalone,
-            SwaggerUIBundle.presets.apis,
-            SwaggerUIStandalonePreset
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIStandalonePreset
             ],
-            layout: "BaseLayout",
+            layout: "StandaloneLayout",
             deepLinking: true,
             showExtensions: true,
             showCommonExtensions: true

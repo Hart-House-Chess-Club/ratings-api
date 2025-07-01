@@ -50,6 +50,13 @@ try:
 except Exception as e:
     print(f"MongoDB connection failed: {e}. Rating list features will be disabled.")
     mongo_enabled = False
+    # Define fallback None values for collections when MongoDB fails
+    client = None
+    db = None
+    fide_collection = None
+    cfc_collection = None
+    uscf_collection = None
+    metadata_collection = None
 
 
 def make_json_serializable(doc):

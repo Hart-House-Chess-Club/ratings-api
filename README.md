@@ -95,9 +95,6 @@ API_TITLE=Chess Ratings API
 API_VERSION=2.0.0
 API_DESCRIPTION=Highly reliable, free, chess ratings API for FIDE, CFC, and other rating systems.
 
-# MongoDB Configuration
-MONGO_TOKEN=your_mongodb_connection_string
-
 # Optional: GA4 Measurement Protocol API Secret (for advanced server-side tracking)
 # GA_API_SECRET=your_measurement_protocol_api_secret_here
 ```
@@ -136,16 +133,6 @@ This project is configured for easy deployment to any Linux server using Docker:
    - The `mongo-docker-compose.yml` includes:
       - Cloud-based MongoDB
    
-   For deployments involving MongoDB Atlas, ensure that the MONGO_URI is set correctly:
-   - Create a `.env` file in the same directory as your docker-compose file with:
-     ```
-     MONGO_TOKEN=your_mongodb_connection_string
-     ```
-   - Or set it in your environment before running docker compose:
-     ```sh
-     export MONGO_TOKEN=your_mongodb_connection_string
-     docker compose -f mongo-docker-compose.yml up -d --build
-     ```
 
 The MongoDB contains rating lists corresponding to respective ratings files such as cfc_ratings for CFC ratings.
 

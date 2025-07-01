@@ -13,12 +13,14 @@ services:
     volumes:
       - ./:/app
       - rating-data:/app/rating-lists
+    env_file:
+      - .env
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_DB=0
       - CACHE_EXPIRY=3600
-      - MONGO_URI=${MONGO_TOKEN}
+      - MONGO_URI=${MONGO_URI}
       - MONGO_DB=fide_api
       - FIDE_DOWNLOAD_URL=https://ratings.fide.com/download/standard_rating_list_xml.zip
       - CFC_DOWNLOAD_URL=https://storage.googleapis.com/cfc-public/data/tdlist.txt
