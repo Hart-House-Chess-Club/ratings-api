@@ -1,44 +1,3 @@
-#!/bin/sh
-# This script initializes both FIDE and CFC rating lists
-# to run this script, make sure you have Python 3 and pip installed
-# and that you have the required packages installed in your Python environment
-# Usage: ./initialize_rating_lists.sh [--no-download]
-
-# Parse command line arguments
-DOWNLOAD_LATEST=True
-
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --no-download)
-            DOWNLOAD_LATEST=False
-            shift
-            ;;
-        -h|--help)
-            echo "Usage: $0 [--no-download]"
-            echo "  --no-download    Skip downloading latest rating lists, use existing data"
-            echo "  -h, --help       Show this help message"
-            exit 0
-            ;;
-        *)
-            echo "Unknown option: $1"
-            echo "Use -h or --help for usage information"
-            exit 1
-            ;;
-    esac
-done
-
-echo "Starting rating lists initialization..."
-if [ "$DOWNLOAD_LATEST" = True ]; then
-    echo "Will download latest rating lists..."
-else
-    echo "Skipping download, using existing rating lists..."
-fi
-
-# Make sure we're in the project directory
-cd "$(dirname "$0")"
-
-# Create a Python script to run the initialization
-cat > ./init_ratings.py << EOL
 import os
 import sys
 import logging
@@ -47,7 +6,7 @@ from src.scraper.ratinglists.updater import update_cfc_rating_list, update_fide_
 from src.scraper.ratinglists.db import reset_collections
 
 # Get download flag from command line argument
-DOWNLOAD_LATEST = ${DOWNLOAD_LATEST}
+DOWNLOAD_LATEST = True
 
 # Configure logging
 logging.basicConfig(
@@ -103,19 +62,3 @@ except Exception as e:
     import traceback
     traceback.print_exc()
     sys.exit(1)
-EOL
-
-# Run the initialization script
-echo "Running Python initialization script..."
-if python3 init_ratings.py; then
-    echo "Python script completed successfully"
-else
-    echo "Python script failed with exit code $?"
-    rm -f ./init_ratings.py
-    exit 1
-fi
-
-# Clean up
-rm -f ./init_ratings.py
-
-echo "Rating list initialization complete!"

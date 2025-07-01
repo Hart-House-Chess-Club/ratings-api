@@ -1,0 +1,57 @@
+name: Update Rating Lists
+
+on:
+  schedule:
+    # Run on the 1st of every month at 2:00 AM UTC
+    - cron: '0 2 1 * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  update-ratings:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        cd ratings-api
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt
+        fi
+        
+    - name: Make script executable
+      run: chmod +x ratings-api/initialize_rating_lists.sh
+      
+    - name: Run rating list update
+      run: |
+        cd ratings-api
+        ./initialize_rating_lists.sh
+      env:
+        MONGO_URI: ${{ secrets.MONGO_URI }}
+        MONGO_DB: ${{ secrets.MONGO_DB || 'fide_api' }}
+        
+    - name: Check for errors
+      if: failure()
+      run: |
+        echo "Rating list update failed!"
+        echo "Check the logs above for details."
+        
+    - name: Commit and push changes (if any)
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add -A
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Auto-update rating lists - $(date)"
+          git push
+        fi

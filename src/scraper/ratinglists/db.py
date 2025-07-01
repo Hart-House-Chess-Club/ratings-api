@@ -5,6 +5,13 @@ from pymongo import MongoClient, ASCENDING, DESCENDING
 from pymongo.collection import Collection
 from typing import Optional, Dict, Any, List, Union
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    print("python-dotenv not installed. Install with: pip install python-dotenv")
+
 # MongoDB configuration - using environment variables with sensible defaults
 MONGO_URI = os.environ.get('MONGO_URI', 'mongodb://localhost:27017')
 MONGO_DB = os.environ.get('MONGO_DB', 'fide_api')
