@@ -55,28 +55,3 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-  deploy:
-    needs: build
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Deploy to server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST_IP }}
-          username: ${{ secrets.HOST_USERNAME }}
-          key: ${{ secrets.HOST_KEY }}
-          port: ${{ secrets.HOST_PORT }}
-          script: |
-            # Clone or update the repository on the server
-            cd ~/fide-api/ratings-api
-            git pull
-            
-            # Create .env file with secrets
-            echo "MONGO_URI=${{ secrets.MONGO_URI }}" > .env
-                        
-            # Run with docker compose
-            docker compose -f mongo-docker-compose.yml down || echo "No previous containers to remove"
-            docker compose -f mongo-docker-compose.yml up -d --build
